@@ -1,52 +1,49 @@
-import { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Typography } from '@mui/material';
+// src/Pages/AdminLoginDialog.js
+import React, { useState } from 'react';
+import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from '@mui/material';
 import { getAdminPassword } from '../db/dbStore';
+
 
 export default function AdminLoginDialog({ open, onClose, onSuccess }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleLogin = async () => {
-    const result = await getAdminPassword();
-    if (result.success) {
-      const { password: storedPassword, expiresAt } = result.data;
-      const now = new Date();
+    try {
+      // Fetch the current password from Firestore
+      const doc = await getAdminPassword();
+      const adminPassword = doc.exists ? doc.data().value : null;
 
-      // Optional: check expiry
-      if (new Date(expiresAt) < now) {
-        setError('Password expired. Please contact admin.');
-        return;
-      }
-
-      if (password === storedPassword) {
+      if (password === adminPassword) {
         setError('');
-        onSuccess();
+        onSuccess(); // navigate to /Admin
         onClose();
       } else {
         setError('Incorrect password');
       }
-    } else {
-      setError('Unable to fetch password from server');
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Something went wrong');
     }
   };
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Admin Authentication</DialogTitle>
+      <DialogTitle>Admin Login</DialogTitle>
       <DialogContent>
         <TextField
-          label="Enter Password"
-          fullWidth
-          margin="dense"
+          label="Password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          fullWidth
+          margin="dense"
+          error={!!error}
+          helperText={error}
         />
-        {error && <Typography color="error">{error}</Typography>}
       </DialogContent>
       <DialogActions>
-        {/* <Button onClick={onClose}>Cancel</Button> */}
-        <Button onClick={()=> console.log(getAdminPassword())}>Cancel</Button>
+        <Button onClick={onClose}>Cancel</Button>
         <Button onClick={handleLogin} variant="contained">Login</Button>
       </DialogActions>
     </Dialog>
