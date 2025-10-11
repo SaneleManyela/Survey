@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Container, Typography, Grid, Card, CardActionArea, CardContent } from '@mui/material';
 import { Page0 } from './Pages/Page0.js';
 import { Page1 } from './Pages/Page1.js';
