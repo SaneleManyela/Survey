@@ -1,19 +1,20 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+// src/App.js
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { Container, Typography, Grid, Card, CardActionArea, CardContent } from '@mui/material';
+
 import { Page0 } from './Pages/Page0.js';
 import { Page1 } from './Pages/Page1.js';
 import { Page2 } from './Pages/Page2.js';
 import { Page3 } from './Pages/Page3.js';
 import { Page4 } from './Pages/Page4.js';
 import { Admin } from './Pages/Admin.js';
-import { useEffect } from 'react';
-import { startPasswordScheduler } from './utils/passwordscheduler.js';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import AdminLoginDialog from './Pages/AdminLoginDialog.js';
+import { startPasswordScheduler } from './utils/passwordscheduler.js';
 
 
-export default function MainMenu() {
+// Named export for MainMenu
+export function MainMenu() {
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -33,7 +34,6 @@ export default function MainMenu() {
       navigate(item.path);
     }
   };
-
 
   return (
     <Container maxWidth="md" sx={{ mt: 6 }}>
@@ -65,8 +65,9 @@ export default function MainMenu() {
   );
 }
 
-export default function App() {
 
+// Default export for App
+export default function App() {
   useEffect(() => {
     startPasswordScheduler();
   }, []);
