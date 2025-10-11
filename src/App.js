@@ -72,14 +72,16 @@ export default function App() {
   }, []);
 
   return (
-    <Routes>
-      <Route path="/" element={<MainMenu />} />
-      <Route path="/Page0" element={<Page0 />} />
-      <Route path="/Page1" element={<Page1 />} />
-      <Route path="/Page2" element={<Page2 />} />
-      <Route path="/Page3" element={<Page3 />} />
-      <Route path="/Page4" element={<Page4 />} />
-      <Route path="/Admin" element={<Admin />} />
-    </Routes>
+    <BrowserRouter basename="/Survey">
+      <Routes>
+        <Route path="/" element={<MainMenu />} />
+        <Route path="/Page0" element={<Page0 />} />
+        <Route path="/Page1" element={<Page1 />} />
+        <Route path="/Page2" element={<Page2 />} />
+        <Route path="/Page3" element={<Page3 />} />
+        <Route path="/Page4" element={<Page4 />} />
+        <Route path="/Admin" element={<Admin />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
