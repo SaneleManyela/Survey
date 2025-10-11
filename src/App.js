@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { Container, Typography, Grid, Card, CardActionArea, CardContent } from '@mui/material';
-
 import { Page0 } from './Pages/Page0.js';
 import { Page1 } from './Pages/Page1.js';
 import { Page2 } from './Pages/Page2.js';
@@ -12,9 +11,8 @@ import { Admin } from './Pages/Admin.js';
 import AdminLoginDialog from './Pages/AdminLoginDialog.js';
 import { startPasswordScheduler } from './utils/passwordscheduler.js';
 
-
-// Named export for MainMenu
-export function MainMenu() {
+// MainMenu stays as a named component
+function MainMenuComponent() {
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -65,7 +63,6 @@ export function MainMenu() {
   );
 }
 
-
 // Default export for App
 export default function App() {
   useEffect(() => {
@@ -75,7 +72,7 @@ export default function App() {
   return (
     <BrowserRouter basename="/Survey">
       <Routes>
-        <Route path="/" element={<MainMenu />} />
+        <Route path="/" element={<MainMenuComponent />} />
         <Route path="/Page0" element={<Page0 />} />
         <Route path="/Page1" element={<Page1 />} />
         <Route path="/Page2" element={<Page2 />} />
