@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import AdminLoginDialog from './Pages/AdminLoginDialog.js';
 
 
-function MainMenu() {
+export default function MainMenu() {
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
 
