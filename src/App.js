@@ -1,6 +1,6 @@
 // src/App.js
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Container, Typography, Grid, Card, CardActionArea, CardContent } from '@mui/material';
 
 import { Page0 } from './Pages/Page0.js';

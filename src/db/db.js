@@ -8,7 +8,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAPKkhNgA8drwNFI0HQsJEDQm-qMV5lJZc",
   authDomain: "survey-ce6f0.firebaseapp.com",
   projectId: "survey-ce6f0",
-  storageBucket: "survey-ce6f0.appspot.com", // <-- fix typo here: .appspot.com not .app
+  storageBucket: "survey-ce6f0.firebasestorage.app",
   messagingSenderId: "884714002319",
   appId: "1:884714002319:web:e0d2a8e199c035a8deddfa",
   measurementId: "G-740KVBMWWT"
