@@ -1,5 +1,7 @@
 import db from './db.js';
 
+// ... (saveSurveyResponse and getAllSurveyResponses remain the same) ...
+
 // ✅ Save a user's survey responses (all 5 pages)
 export async function saveSurveyResponse(userId, responses) {
   // responses: { page0: {...}, page1: {...}, ... }
@@ -11,8 +13,8 @@ export async function saveSurveyResponse(userId, responses) {
     });
     return { success: true };
   } catch (error) {
-    console.error("Error saving survey response:", error);
-    return { success: false, error };
+    console.error("❌ Error saving survey response:", error?.message || error);
+    return { success: false, error: error?.message || 'Unknown error' };
   }
 }
 
@@ -22,24 +24,29 @@ export async function getAllSurveyResponses() {
     const snapshot = await db.collection('surveyResponses').get();
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
-    console.error("Error fetching survey responses:", error);
+    console.error("❌ Error fetching survey responses:", error?.message || error);
     return [];
   }
 }
 
+
 // ✅ NEW: Save the generated admin password
 export async function saveAdminPassword(password, expiresAt) {
+  // Ensure expiresAt is passed as a Date object from the scheduler
+  const expiresAtValue = expiresAt instanceof Date ? expiresAt.toISOString() : expiresAt;
+
   try {
     await db.collection('adminPasswords').doc('current').set({
       password,
-      expiresAt: expiresAt.toISOString(),
+      expiresAt: expiresAtValue, // Use the prepared string value
       updatedAt: new Date()
     });
     console.log('✅ Admin password saved to Firestore');
     return { success: true };
   } catch (error) {
-    console.error("❌ Error saving admin password:", error);
-    return { success: false, error };
+    // 💡 Improvement: Log the message for clarity
+    console.error("❌ Error saving admin password:", error?.message || error);
+    return { success: false, error: error?.message || 'Unknown error' };
   }
 }
 
@@ -53,7 +60,8 @@ export async function getAdminPassword() {
       return { success: false, error: 'No password set' };
     }
   } catch (error) {
-    console.error("❌ Error fetching admin password:", error);
-    return { success: false, error };
+    // 💡 Improvement: Log the message for clarity
+    console.error("❌ Error fetching admin password:", error?.message || error);
+    return { success: false, error: error?.message || 'Unknown error' };
   }
 }
