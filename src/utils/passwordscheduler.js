@@ -1,4 +1,5 @@
-import { getAdminPassword } from '../db/dbStore.js';
+// Passwordscheduler.js
+import { saveAdminPassword } from '../db/dbStore.js'; // ⬅️ NEW: Import the correct saving function
 
 function generateRandomPassword(length = 8) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -14,16 +15,15 @@ export async function schedulePassword() {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 1); // expires in 1 day
 
-  await getAdminPassword().then(adminPassword => {
-    try {
-        adminPassword.collection('adminPasswords').doc('current').set({
-        password,
-        expiresAt: expiresAt.toISOString()
-      });
-    } catch (error) {
-      console.error("Error scheduling password:", error?.message);
-    }
-  });
+  // ❌ REMOVED: await getAdminPassword().then(...)
+  // ✅ ADDED: A direct call to the saving function
+  const result = await saveAdminPassword(password, expiresAt);
+
+  if (result.success) {
+      console.log("✅ New admin password successfully scheduled.");
+  } else {
+      console.error("❌ Failed to schedule admin password:", result.error);
+  }
 
   console.log("New admin password generated:", password);
 }
