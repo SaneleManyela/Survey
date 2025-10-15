@@ -15,10 +15,14 @@ export async function schedulePassword() {
   expiresAt.setDate(expiresAt.getDate() + 1); // expires in 1 day
 
   await getAdminPassword().then(adminPassword => {
-    adminPassword.collection('adminPasswords').doc('current').set({
-      password,
-      expiresAt: expiresAt.toISOString()
-    });
+    try {
+        adminPassword.collection('adminPasswords').doc('current').set({
+        password,
+        expiresAt: expiresAt.toISOString()
+      });
+    } catch (error) {
+      console.error("Error scheduling password:", error?.message);
+    }
   });
 
   console.log("New admin password generated:", password);
