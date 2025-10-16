@@ -1,6 +1,6 @@
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
-import 'firebase/compat/auth';
+import 'firebase/compat/auth'; // <--- Auth is already here
 import 'firebase/compat/storage';
 
 // Your web app's Firebase configuration
@@ -20,7 +20,24 @@ if (!firebase.apps.length) {
 }
 
 export const db = firebase.firestore();
-export const auth = firebase.auth();
+export const auth = firebase.auth(); // <--- Auth object is created
 export const storage = firebase.storage();
+
+// ✅ NEW: Function to ensure the client is authenticated anonymously
+export async function ensureAuth() {
+    if (auth.currentUser) {
+        // Already signed in, do nothing
+        return auth.currentUser;
+    }
+    try {
+        const userCredential = await auth.signInAnonymously();
+        console.log("✅ Signed in anonymously with UID:", userCredential.user.uid);
+        return userCredential.user;
+    } catch (error) {
+        console.error("❌ Anonymous sign-in failed:", error.message);
+        // Throwing the error prevents Firestore operations from running
+        throw error; 
+    }
+}
 
 export default db;
