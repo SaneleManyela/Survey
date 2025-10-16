@@ -5,7 +5,7 @@ import db, { ensureAuth } from './db.js';
 // ✅ Save a user's survey responses (all 5 pages)
 export async function saveSurveyResponse(userId, responses) {
   try {
-    // 🛑 CALL AUTHENTICATION FIRST
+    // 🛑 The silent sign-in happens here
     await ensureAuth(); 
     
     await db.collection('surveyResponses').add({
