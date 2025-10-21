@@ -1,17 +1,19 @@
 // Import both db (the default export) and the new ensureAuth function
 import db, { ensureAuth } from './db.js'; 
-
+import { getFirestore, collection, addDoc, Timestamp } from "firebase/firestore"; // Import Timestamp
 
 // ✅ Save a user's survey responses (all 5 pages)
 export async function saveSurveyResponse(userId, responses) {
   try {
     // 🛑 The silent sign-in happens here
     await ensureAuth(); 
+
+    console.log('Saving survey responses:', responses);
     
     await db.collection('surveyResponses').add({
       userId,
       responses,
-      timestamp: new Date()
+      timestamp: Timestamp.now() // ⭐ Corrected for stability
     });
     return { success: true };
   } catch (error) {

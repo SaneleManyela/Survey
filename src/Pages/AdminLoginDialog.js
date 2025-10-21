@@ -12,6 +12,7 @@ export default function AdminLoginDialog({ open, onClose, onSuccess }) {
     try {
       // Fetch the current password from Firestore
       const doc = await getAdminPassword();
+      console.log('Fetched admin password document:', doc);
       const adminPassword = doc.exists ? doc.data().value : null;
 
       if (password === adminPassword) {
