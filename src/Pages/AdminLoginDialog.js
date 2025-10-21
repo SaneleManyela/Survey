@@ -1,7 +1,7 @@
 // src/Pages/AdminLoginDialog.js
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from '@mui/material';
-import { getAdminPassword } from '../db/dbStore';
+import { getAdminPassword } from '../db/dbStore.js';
 
 
 export default function AdminLoginDialog({ open, onClose, onSuccess }) {
