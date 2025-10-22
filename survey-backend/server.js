@@ -7,8 +7,14 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 5000;
 app.use(cors({ origin: "*" }));
 app.use(express.json());
+
+app.use('/api', surveyRoutes);
+app.listen(PORT, () => {
+  console.log(`Survey backend running on port ${PORT}`);
+})
 
 // 🔥 Initialize Firebase Admin SDK
 if (!admin.apps.length) {
