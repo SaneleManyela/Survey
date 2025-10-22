@@ -5,13 +5,21 @@ import { nanoid } from 'nanoid';
 
 const router = express.Router();
 
-// Configure lowdb
+// Configure lowdb adapter and default structure ✅
 const adapter = new JSONFile('db.json');
-const db = new Low(adapter);
+const defaultData = { 
+  surveyResponses: [], 
+  adminPassword: { password: '', expiresAt: null } 
+};
+
+// ✅ Pass default data when creating the Low instance
+const db = new Low(adapter, defaultData);
 
 // Initialize database
 await db.read();
-db.data ||= { surveyResponses: [], adminPassword: { password: '', expiresAt: null } };
+
+// If db.json is empty, ensure defaults exist
+db.data ||= defaultData;
 await db.write();
 
 /**
@@ -22,7 +30,9 @@ await db.write();
 router.post('/saveSurvey', async (req, res) => {
   const { userId, responses } = req.body;
 
-  if (!userId || !responses) return res.status(400).json({ success: false, error: 'Missing userId or responses' });
+  if (!userId || !responses) {
+    return res.status(400).json({ success: false, error: 'Missing userId or responses' });
+  }
 
   await db.read();
   db.data.surveyResponses.push({
@@ -52,7 +62,10 @@ router.get('/allSurveys', async (req, res) => {
  */
 router.post('/adminPassword', async (req, res) => {
   const { password, expiresAt } = req.body;
-  if (!password) return res.status(400).json({ success: false, error: 'Missing password' });
+
+  if (!password) {
+    return res.status(400).json({ success: false, error: 'Missing password' });
+  }
 
   await db.read();
   db.data.adminPassword = {
