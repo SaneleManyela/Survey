@@ -3,37 +3,41 @@ import cors from "cors";
 import admin from "firebase-admin";
 import { nanoid } from "nanoid";
 import dotenv from "dotenv";
-import surveyRoutes from './routes/routes.js';
+import surveyRoutes from "./routes/routes.js";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ Global CORS middleware
+// ✅ 1. CORS middleware FIRST (before anything)
 app.use(cors({
-  origin: 'https://sanelemanyela.github.io',
+  origin: ['https://sanelemanyela.github.io'],
+  methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}));
+
+// ✅ 2. Ensure OPTIONS preflights always get headers
+app.options('*', cors({
+  origin: ['https://sanelemanyela.github.io'],
   methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// ✅ Handle OPTIONS preflight for all routes
-app.use((req, res, next) => {
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-  next();
-});
-
+// ✅ 3. JSON body parser after CORS
 app.use(express.json());
 
-// Basic test route
-app.get("/", (req, res) => res.send("Server is alive ✅"));
+// ✅ 4. Test route
+app.get("/", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "https://sanelemanyela.github.io");
+  res.send("Server is alive ✅");
+});
 
-// Survey routes
+// ✅ 5. Your routes
 app.use("/api", surveyRoutes);
 
-// Firebase Admin SDK
+// ✅ 6. Firebase
 if (!admin.apps.length) {
   const serviceAccount = {
     type: process.env.FIREBASE_TYPE,
@@ -55,7 +59,6 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`🚀 Survey backend running on port ${PORT}`);
 });
