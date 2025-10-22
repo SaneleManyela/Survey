@@ -19,11 +19,12 @@ app.use(cors({
 }));
 
 // ✅ 2. Ensure OPTIONS preflights always get headers
-app.options('*', cors({
+app.options(/.*/, cors({
   origin: ['https://sanelemanyela.github.io'],
   methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
 
 // ✅ 3. JSON body parser after CORS
 app.use(express.json());
