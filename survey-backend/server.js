@@ -17,7 +17,7 @@ app.use(cors({
 }));
 
 // Handle preflight requests
-app.options('/api/*', cors());
+//app.options('/api/*', cors());
 
 app.use(express.json());
 
@@ -25,7 +25,7 @@ app.use(express.json());
 app.get("/", (req, res) => res.send("Server is alive ✅"));
 
 // ✅ Use your survey routes
-//app.use("/api", surveyRoutes);
+app.use("/api", surveyRoutes);
 
 // 🔥 Initialize Firebase Admin SDK
 if (!admin.apps.length) {
