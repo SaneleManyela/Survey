@@ -10,12 +10,14 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
 app.use(cors({
   origin: 'https://sanelemanyela.github.io',
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type'],
+  allowedHeaders: ['Content-Type', 'Authorization'], // add headers your frontend sends
 }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 app.use(express.json());
 
