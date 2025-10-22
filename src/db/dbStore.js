@@ -26,11 +26,16 @@ export async function getAllSurveyResponses() {
 
 export async function saveAdminPassword(password, expiresAt) {
   try {
-    const res = await fetch(`${API_URL}/adminPassword`, {
-      method: 'POST',
+    const res = await fetch(`${API_URL}/adminPassword`, { // ✅ backticks
+      method: 'PUT', // ✅ PUT instead of POST
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password, expiresAt })
     });
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! Status: ${res.status}`);
+    }
+
     return await res.json();
   } catch (error) {
     console.error('Error saving admin password:', error);
