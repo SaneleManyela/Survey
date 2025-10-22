@@ -3,18 +3,22 @@ import cors from "cors";
 import admin from "firebase-admin";
 import { nanoid } from "nanoid";
 import dotenv from "dotenv";
+import surveyRoutes from "./routes/surveyRoutes.js";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Middleware
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-app.use('/api', surveyRoutes);
-app.listen(PORT, () => {
-  console.log(`Survey backend running on port ${PORT}`);
-})
+// Basic test route
+app.get("/", (req, res) => res.send("Server is alive ✅"));
+
+// ✅ Use your survey routes
+app.use("/api", surveyRoutes);
 
 // 🔥 Initialize Firebase Admin SDK
 if (!admin.apps.length) {
@@ -37,3 +41,8 @@ if (!admin.apps.length) {
 }
 
 const db = admin.firestore();
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`🚀 Survey backend running on port ${PORT}`);
+});
