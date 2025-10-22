@@ -11,7 +11,12 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors({ origin: "*" }));
+app.use(cors({
+  origin: 'https://sanelemanyela.github.io',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+}));
+
 app.use(express.json());
 
 // Basic test route
