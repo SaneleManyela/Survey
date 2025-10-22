@@ -3,7 +3,7 @@ import cors from "cors";
 import admin from "firebase-admin";
 import { nanoid } from "nanoid";
 import dotenv from "dotenv";
-import surveyRoutes from "./routes/surveyRoutes.js";
+import surveyRoutes from './routes/routes.js';
 
 dotenv.config();
 
