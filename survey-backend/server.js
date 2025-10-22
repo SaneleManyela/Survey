@@ -12,8 +12,8 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: 'https://sanelemanyela.github.io/Survey',
-  methods: ['GET', 'POST'],
+  origin: 'https://sanelemanyela.github.io',
+  methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
 }));
 
