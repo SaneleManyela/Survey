@@ -25,7 +25,7 @@ app.use(express.json());
 app.get("/", (req, res) => res.send("Server is alive ✅"));
 
 // ✅ Use your survey routes
-app.use("/api", surveyRoutes);
+//app.use("/api", surveyRoutes);
 
 // 🔥 Initialize Firebase Admin SDK
 if (!admin.apps.length) {
