@@ -1,75 +1,50 @@
-// src/db/dbStore.js
-import db, { ensureAuth } from './db.js';
-import {
-  collection,
-  addDoc,
-  setDoc,
-  getDoc,
-  getDocs,
-  doc,
-  Timestamp
-} from "firebase/firestore";
+const API_URL = 'http://localhost:5000/api'; // Update with your deployed URL
 
-// ✅ Save a user's survey responses (all 5 pages)
 export async function saveSurveyResponse(userId, responses) {
   try {
-    await ensureAuth();
-
-    console.log('Saving survey responses:', responses);
-
-    await addDoc(collection(db, 'surveyResponses'), {
-      userId,
-      responses,
-      timestamp: Timestamp.now()
+    const res = await fetch(`${API_URL}/saveSurvey`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, responses })
     });
-
-    return { success: true };
+    return await res.json();
   } catch (error) {
-    console.error("❌ Error saving survey response:", error?.message || error);
-    return { success: false, error: error?.message || 'Unknown error' };
+    console.error('Error saving survey response:', error);
+    return { success: false, error: error.message };
   }
 }
 
-// ✅ Fetch all survey responses for admin
 export async function getAllSurveyResponses() {
   try {
-    await ensureAuth();
-
-    const snapshot = await getDocs(collection(db, 'surveyResponses'));
-    return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const res = await fetch(`${API_URL}/allSurveys`);
+    return await res.json();
   } catch (error) {
-    console.error("❌ Error fetching survey responses:", error?.message || error);
+    console.error('Error fetching responses:', error);
     return [];
   }
 }
 
-// ✅ Save the generated admin password
 export async function saveAdminPassword(password, expiresAt) {
   try {
-    await ensureAuth();
-
-    await setDoc(doc(db, 'adminPasswords', 'current'), {
-      password,
-      expiresAt: expiresAt || Timestamp.now()
+    const res = await fetch(`${API_URL}/adminPassword`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password, expiresAt })
     });
-
-    console.log('✅ Admin password saved to Firestore');
-    return { success: true };
+    return await res.json();
   } catch (error) {
-    console.error("❌ Error saving admin password:", error?.message || error);
-    return { success: false, error: error?.message || 'Unknown error' };
+    console.error('Error saving admin password:', error);
+    return { success: false, error: error.message };
   }
 }
 
-// ✅ Fetch the current admin password (for login check)
 export async function getAdminPassword() {
   try {
-    await ensureAuth();
-
-    const passwordDoc = await getDoc(doc(db, 'adminPasswords', 'current'));
-    return passwordDoc.exists() ? passwordDoc.data().password : null;
+    const res = await fetch(`${API_URL}/adminPassword`);
+    const data = await res.json();
+    return data.password || null;
   } catch (error) {
-    console.error("❌ Error fetching admin password:", error?.message || error);
+    console.error('Error fetching admin password:', error);
     return null;
   }
 }

@@ -1,0 +1,24 @@
+# render.yaml
+services:
+  - type: web
+    name: survey-backend
+    env: node
+    region: oregon # choose your region
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    pullRequestPreviewsEnabled: true
+    envVars:
+      - key: FIREBASE_API_KEY
+        value: "AIzaSyAPKkhNgA8drwNFI0HQsJEDQm-qMV5lJZc"
+      - key: FIREBASE_AUTH_DOMAIN
+        value: "survey-ce6f0.firebaseapp.com"
+      - key: FIREBASE_PROJECT_ID
+        value: "survey-ce6f0"
+      - key: FIREBASE_STORAGE_BUCKET
+        value: "survey-ce6f0.appspot.com"
+      - key: FIREBASE_MESSAGING_SENDER_ID
+        value: "884714002319"
+      - key: FIREBASE_APP_ID
+        value: "1:884714002319:web:e0d2a8e199c035a8deddfa"
