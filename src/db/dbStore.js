@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api'; // Update with your deployed URL
+const API_URL = 'https://survey-u3s9.onrender.com/api'; // Update with your deployed URL
 
 export async function saveSurveyResponse(userId, responses) {
   try {
