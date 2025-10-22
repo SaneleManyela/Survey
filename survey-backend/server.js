@@ -10,22 +10,30 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware for API routes only
-app.use('/api', cors({
+// ✅ Global CORS middleware
+app.use(cors({
   origin: 'https://sanelemanyela.github.io',
   methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+// ✅ Handle OPTIONS preflight for all routes
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 app.use(express.json());
 
 // Basic test route
 app.get("/", (req, res) => res.send("Server is alive ✅"));
 
-// ✅ Use your survey routes
+// Survey routes
 app.use("/api", surveyRoutes);
 
-// 🔥 Initialize Firebase Admin SDK
+// Firebase Admin SDK
 if (!admin.apps.length) {
   const serviceAccount = {
     type: process.env.FIREBASE_TYPE,
