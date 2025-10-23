@@ -11,7 +11,6 @@ const PORT = process.env.PORT || 5000;
 
 /**
  * ✅ 1. Global CORS configuration — this MUST be first.
- * We explicitly handle all routes including preflights.
  */
 const corsOptions = {
   origin: "https://sanelemanyela.github.io",
@@ -22,18 +21,25 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// ✅ 2. Explicitly respond to preflight OPTIONS requests
-app.options("*", (req, res) => {
+/**
+ * ✅ 2. Handle all OPTIONS (preflight) requests explicitly.
+ * Use a regex instead of '*' to avoid the path-to-regexp crash.
+ */
+app.options(/.*/, (req, res) => {
   res.header("Access-Control-Allow-Origin", "https://sanelemanyela.github.io");
   res.header("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
   res.sendStatus(204);
 });
 
-// ✅ 3. JSON parser
+/**
+ * ✅ 3. Parse JSON bodies
+ */
 app.use(express.json());
 
-// ✅ 6. Firebase
+/**
+ * ✅ 4. Initialize Firebase
+ */
 if (!admin.apps.length) {
   const serviceAccount = {
     type: process.env.FIREBASE_TYPE,
@@ -55,15 +61,22 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 
-// ✅ 5. Routes
+/**
+ * ✅ 5. Routes
+ */
 app.use("/api", surveyRoutes);
 
-// ✅ 6. Test route
+/**
+ * ✅ 6. Test route
+ */
 app.get("/", (req, res) => {
   res.header("Access-Control-Allow-Origin", "https://sanelemanyela.github.io");
   res.send("Server is alive ✅");
 });
 
+/**
+ * ✅ 7. Start server
+ */
 app.listen(PORT, () => {
   console.log(`🚀 Survey backend running on port ${PORT}`);
 });
