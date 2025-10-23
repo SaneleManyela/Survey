@@ -6,6 +6,8 @@ import dotenv from "dotenv";
 import surveyRoutes from "./routes/routes.js";
 
 dotenv.config();
+const app = express();
+const PORT = process.env.PORT || 5000;
 
 // ✅ 1. CORS middleware FIRST (before anything)
 app.use(cors({
