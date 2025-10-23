@@ -12,15 +12,15 @@ const PORT = process.env.PORT || 5000;
 
 // ✅ 1. CORS middleware FIRST (before anything)
 app.use(cors({
-  origin: ['https://sanelemanyela.github.io'],
+  origin: 'https://sanelemanyela.github.io',
   methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
 
 // ✅ 2. Ensure OPTIONS preflights always get headers
-app.options(/.*/, cors({
-  origin: ['https://sanelemanyela.github.io'],
+app.options('*', cors({
+  origin: 'https://sanelemanyela.github.io',
   methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
@@ -29,14 +29,16 @@ app.options(/.*/, cors({
 // ✅ 3. JSON body parser after CORS
 app.use(express.json());
 
-// ✅ 4. Test route
+
+// ✅ 4. Your routes
+app.use("/api", surveyRoutes);
+
+
+// ✅ 5. Test route
 app.get("/", (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "https://sanelemanyela.github.io");
   res.send("Server is alive ✅");
 });
-
-// ✅ 5. Your routes
-app.use("/api", surveyRoutes);
 
 // ✅ 6. Firebase
 if (!admin.apps.length) {
