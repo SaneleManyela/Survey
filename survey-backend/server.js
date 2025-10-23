@@ -25,11 +25,12 @@ app.use(cors(corsOptions));
  * ✅ 2. Handle all OPTIONS (preflight) requests explicitly.
  * Use a regex instead of '*' to avoid the path-to-regexp crash.
  */
-app.options(/.*/, (req, res) => {
+app.options((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "https://sanelemanyela.github.io");
   res.header("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
-  res.sendStatus(204);
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
 });
 
 /**
