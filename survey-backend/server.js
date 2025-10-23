@@ -7,32 +7,33 @@ import surveyRoutes from "./routes/routes.js";
 
 dotenv.config();
 
-const app = express();
-const PORT = process.env.PORT || 5000;
-
 // ✅ 1. CORS middleware FIRST (before anything)
 app.use(cors({
-  origin: 'https://sanelemanyela.github.io',
-  methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: "https://sanelemanyela.github.io",
+  methods: ["GET", "POST", "PUT", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 }));
 
-// ✅ 2. Ensure OPTIONS preflights always get headers
-app.options('*', cors({
-  origin: 'https://sanelemanyela.github.io',
-  methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
-
+// 🚧 2. Diagnostic handler to catch preflight requests
+// (instead of app.options('*', ...), which caused path-to-regexp error)
+app.use((req, res, next) => {
+  console.log(`🧭 ${req.method} ${req.path}`);
+  if (req.method === "OPTIONS") {
+    console.log("🛰️ Preflight received!");
+    res.header("Access-Control-Allow-Origin", "https://sanelemanyela.github.io");
+    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
+    return res.sendStatus(204);
+  }
+  next();
+});
 
 // ✅ 3. JSON body parser after CORS
 app.use(express.json());
 
-
 // ✅ 4. Your routes
 app.use("/api", surveyRoutes);
-
 
 // ✅ 5. Test route
 app.get("/", (req, res) => {
