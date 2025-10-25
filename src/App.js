@@ -23,11 +23,12 @@ function MainMenu() {
     { title: "Fundamentals of Persuasion and Influence", path: "/Page2" },
     { title: "Style of Conflict Resolution Self-Evaluation", path: "/Page3" },
     { title: "Assessing One's Leadership: Potential towards Conflict", path: "/Page4" },
-    { title: "Admin Dashboard", path: "/Admin" }
+    { title: "Admin Panel", path: "/Admin" },
+    { title: "Admin Login", path: "/AdminLoginDialog" }
   ];
 
   const handleCardClick = (item) => {
-    if (item.title === "Admin Dashboard") {
+    if (item.title === "Admin Login") {
       setDialogOpen(true);
     } else {
       navigate(item.path);
