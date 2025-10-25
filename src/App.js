@@ -48,6 +48,7 @@ function MainMenu() {
                 <CardContent>
                   <Typography variant="h6" align="center" color="primary" sx={{ fontWeight: 700 }}>
                     {item.title}
+                    {console.log(item.title)}
                   </Typography>
                 </CardContent>
               </CardActionArea>

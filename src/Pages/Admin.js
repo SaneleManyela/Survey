@@ -70,7 +70,7 @@ const pageQuestions = [
       "I always take into consideration how important it is to keep a positive, long-term working relationship while resolving conflicts with coworkers.",
       "People who are too friendly or welcoming get the worst outcomes in conflict resolution."
     ],
-    options: ["1", "2", "3", "4", "5"]
+    options: ["true", "false"]
   },
   {
     title: "Assessing One's Leadership: Potential towards Conflict",
@@ -84,7 +84,7 @@ const pageQuestions = [
       "I like the challenge of work competitions or 'turf wars.'",
       "When someone is nasty to me, I usually feel forced to return the favor."
     ],
-    options: ["1", "2", "3", "4", "5"]
+    options: ["true", "false"]
   }
 ];
 
