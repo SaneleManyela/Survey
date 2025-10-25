@@ -1,13 +1,29 @@
 // src/Pages/Admin.js
-import { useEffect, useState } from 'react';
-import { ThemeProvider } from '@mui/material/styles';
-import theme from './theme.js';
-import { Container, Typography, Paper, Table, TableHead, TableRow, TableCell, TableBody, CircularProgress, Button } from '@mui/material';
-import { Link } from 'react-router-dom';
-import HomeIcon from '@mui/icons-material/Home';
-import { getAllSurveyResponses } from '../db/dbStore.js';
+import { useEffect, useState } from "react";
+import { ThemeProvider } from "@mui/material/styles";
+import theme from "./theme.js";
+import {
+  Container,
+  Typography,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  CircularProgress,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import { Link } from "react-router-dom";
+import HomeIcon from "@mui/icons-material/Home";
+import { getAllSurveyResponses } from "../db/dbStore.js";
 
-
+// Questions data for each page
 const pageQuestions = [
   {
     title: "Foundations of Communication Style",
@@ -22,9 +38,9 @@ const pageQuestions = [
       "Any time I tell a joke or a comment that I find funny, people usually chuckle.",
       "I keep myself informed by watching news shows on television or reading news articles online.",
       "My voice and gestures have been described as enthusiastic, vibrant, colorful, and dynamic by others.",
-      "I usually send text messages with better grammar and spelling than I receive."
+      "I usually send text messages with better grammar and spelling than I receive.",
     ],
-    options: ["true", "false"]
+    options: ["true", "false"],
   },
   {
     title: "Excellent Speaking and Writing Strategies",
@@ -37,9 +53,9 @@ const pageQuestions = [
       "I make sure my arguments are backed up by reliable data, facts, or figures rather than just my own opinion.",
       "I want to reduce unneeded filler words and typical linguistic ticks (e.g. 'um,' 'uh').",
       "I value straightforward communication, starting with the most important facts.",
-      "I only use technical or industry-specific terms when it's necessary and understood by my audience."
+      "I only use technical or industry-specific terms when it's necessary and understood by my audience.",
     ],
-    options: ["true", "false"]
+    options: ["true", "false"],
   },
   {
     title: "Fundamentals of Persuasion and Influence",
@@ -52,9 +68,9 @@ const pageQuestions = [
       "I make sure my arguments are backed up by reliable data, facts, or figures rather than just my own opinion.",
       "I want to reduce unneeded filler words and typical linguistic ticks (e.g. 'um,' 'uh').",
       "I value straightforward communication, starting with the most important facts.",
-      "I only use technical or industry-specific terms when it's necessary and understood by my audience."
+      "I only use technical or industry-specific terms when it's necessary and understood by my audience.",
     ],
-    options: ["true", "false"]
+    options: ["true", "false"],
   },
   {
     title: "Style of Conflict Resolution Self-Evaluation",
@@ -68,9 +84,9 @@ const pageQuestions = [
       "When disagreeing, I focus on paying close attention to understand the other person's point of view.",
       "I refuse to surrender or compromise during an argument because I am confident about my point.",
       "I always take into consideration how important it is to keep a positive, long-term working relationship while resolving conflicts with coworkers.",
-      "People who are too friendly or welcoming get the worst outcomes in conflict resolution."
+      "People who are too friendly or welcoming get the worst outcomes in conflict resolution.",
     ],
-    options: ["true", "false"]
+    options: ["true", "false"],
   },
   {
     title: "Assessing One's Leadership: Potential towards Conflict",
@@ -82,31 +98,37 @@ const pageQuestions = [
       "Workplace conflict can either motivate or depress me.",
       "When my department or team is compared to others, I feel competitive.",
       "I like the challenge of work competitions or 'turf wars.'",
-      "When someone is nasty to me, I usually feel forced to return the favor."
+      "When someone is nasty to me, I usually feel forced to return the favor.",
     ],
-    options: ["true", "false"]
-  }
+    options: ["true", "false"],
+  },
 ];
 
+// Aggregate counts for page options
 function aggregateCounts(responses, pageKey, numQuestions, options) {
-  // Initialize counts: [questionIndex][option] = count
   const counts = Array.from({ length: numQuestions }, () =>
-    Object.fromEntries(options.map(opt => [opt, 0]))
+    Object.fromEntries(options.map((opt) => [opt, 0]))
   );
-  responses.forEach(resp => {
+  responses.forEach((resp) => {
     const pageAnswers = resp.responses?.[pageKey] || {};
     Object.entries(pageAnswers).forEach(([qIdx, value]) => {
-      if (counts[qIdx] && counts[qIdx][value] !== undefined) {
-        counts[qIdx][value]++;
-      }
+      if (counts[qIdx] && counts[qIdx][value] !== undefined) counts[qIdx][value]++;
     });
   });
   return counts;
 }
 
+// Count participants per page
+function countParticipantsPerPage(responses, pageKey) {
+  return responses.filter((resp) => resp.responses?.[pageKey]).length;
+}
+
 export function Admin() {
   const [loading, setLoading] = useState(true);
   const [responses, setResponses] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0); // current survey page
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedResponses, setSelectedResponses] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -118,10 +140,33 @@ export function Admin() {
     fetchData();
   }, []);
 
+  const handleViewResponses = (pageIdx) => {
+    const pageKey = `page${pageIdx}`;
+    const pageResponses = responses.map((resp) => ({
+      id: resp.id,
+      answers: resp.responses?.[pageKey] || {},
+    }));
+    setSelectedResponses(pageResponses);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedResponses([]);
+  };
+
+  const page = pageQuestions[currentPage] || { title: "", questions: [], options: [] };
+  const counts = aggregateCounts(
+    responses,
+    `page${currentPage}`,
+    page.questions.length,
+    page.options
+  );
+  const participantsPerPage = countParticipantsPerPage(responses, `page${currentPage}`);
+
   return (
     <ThemeProvider theme={theme}>
       <Container maxWidth="lg" sx={{ mt: 4 }}>
-        {/* Home button */}
         <Button
           component={Link}
           to="/"
@@ -129,17 +174,15 @@ export function Admin() {
           startIcon={<HomeIcon />}
           sx={{
             mb: 2,
-            color: 'black',
-            fontWeight: 'bold',
-            borderColor: 'black',
-            '&:hover': {
-              borderColor: 'black',
-              backgroundColor: '#f5f5f5'
-            }
+            color: "black",
+            fontWeight: "bold",
+            borderColor: "black",
+            "&:hover": { borderColor: "black", backgroundColor: "#f5f5f5" },
           }}
         >
           Home
         </Button>
+
         <Typography variant="h3" gutterBottom>
           Survey Dashboard
         </Typography>
@@ -147,39 +190,110 @@ export function Admin() {
           <Typography variant="h6">
             Total Participants: {loading ? <CircularProgress size={18} /> : responses.length}
           </Typography>
+          <Typography variant="h6">
+            Participants on this page: {loading ? <CircularProgress size={18} /> : participantsPerPage}
+          </Typography>
         </Paper>
-        {pageQuestions.map((page, pageIdx) => {
-          const counts = aggregateCounts(responses, `page${pageIdx}`, page.questions.length, page.options);
-          return (
-            <Paper key={pageIdx} sx={{ p: 3, mb: 4 }}>
-              <Typography variant="h5" gutterBottom>
-                {page.title}
-              </Typography>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Statement</TableCell>
-                    {page.options.map(opt => (
-                      <TableCell key={opt} align="center">{opt}</TableCell>
+
+        {/* Page navigation */}
+        <Paper sx={{ p: 3, mb: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            {page.title}
+          </Typography>
+          <Button
+            variant="outlined"
+            onClick={() => handleViewResponses(currentPage)}
+            sx={{ mb: 2, color: "black", borderColor: "black" }}
+          >
+            View Individual Responses
+          </Button>
+
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Statement</TableCell>
+                {page.options.map((opt) => (
+                  <TableCell key={opt} align="center">
+                    {opt}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {page.questions.map((q, qIdx) => (
+                <TableRow key={qIdx}>
+                  <TableCell>{q}</TableCell>
+                  {page.options.map((opt) => (
+                    <TableCell key={opt} align="center">
+                      {counts[qIdx][opt]}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          {/* Pagination buttons */}
+          <div style={{ marginTop: 16, display: "flex", justifyContent: "space-between" }}>
+            <Button
+              disabled={currentPage === 0}
+              onClick={() => setCurrentPage((p) => p - 1)}
+              sx={{ color: "black", borderColor: "black" }}
+            >
+              Previous
+            </Button>
+            <Typography>
+              Page {currentPage + 1} / {pageQuestions.length}
+            </Typography>
+            <Button
+              disabled={currentPage === pageQuestions.length - 1}
+              onClick={() => setCurrentPage((p) => p + 1)}
+              sx={{ color: "black", borderColor: "black" }}
+            >
+              Next
+            </Button>
+          </div>
+        </Paper>
+
+        {/* Dialog for individual responses */}
+        <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="md">
+          <DialogTitle>
+            Individual Responses
+            <IconButton
+              aria-label="close"
+              onClick={handleCloseDialog}
+              sx={{ position: "absolute", right: 8, top: 8 }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent dividers>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>User ID</TableCell>
+                  {page.questions.map((q, qIdx) => (
+                    <TableCell key={qIdx} align="center">
+                      Q{qIdx + 1}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {selectedResponses.map((resp) => (
+                  <TableRow key={resp.id}>
+                    <TableCell>{resp.id}</TableCell>
+                    {page.questions.map((q, qIdx) => (
+                      <TableCell key={qIdx} align="center">
+                        {resp.answers[qIdx] || "-"}
+                      </TableCell>
                     ))}
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {page.questions.map((q, qIdx) => (
-                    <TableRow key={qIdx}>
-                      <TableCell>{q}</TableCell>
-                      {page.options.map(opt => (
-                        <TableCell key={opt} align="center">
-                          {counts[qIdx][opt]}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Paper>
-          );
-        })}
+                ))}
+              </TableBody>
+            </Table>
+          </DialogContent>
+        </Dialog>
       </Container>
     </ThemeProvider>
   );

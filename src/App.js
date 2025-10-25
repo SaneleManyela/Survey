@@ -1,5 +1,5 @@
 // src/App.js
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Container, Typography, Grid, Card, CardActionArea, CardContent } from '@mui/material';
 
@@ -9,13 +9,11 @@ import { Page2 } from './Pages/Page2.js';
 import { Page3 } from './Pages/Page3.js';
 import { Page4 } from './Pages/Page4.js';
 import { Admin } from './Pages/Admin.js';
-import AdminLoginDialog from './Pages/AdminLoginDialog.js';
 import { startPasswordScheduler } from './utils/passwordscheduler.js';
 
 // ---------------- MainMenu ----------------
 function MainMenu() {
   const navigate = useNavigate();
-  const [dialogOpen, setDialogOpen] = useState(false);
 
   const menuItems = [
     { title: "Foundations of Communication Style", path: "/Page0" },
@@ -23,16 +21,11 @@ function MainMenu() {
     { title: "Fundamentals of Persuasion and Influence", path: "/Page2" },
     { title: "Style of Conflict Resolution Self-Evaluation", path: "/Page3" },
     { title: "Assessing One's Leadership: Potential towards Conflict", path: "/Page4" },
-    { title: "Admin Panel", path: "/Admin" },
-    { title: "Admin Login", path: "/AdminLoginDialog" }
+    { title: "Admin Panel", path: "/Admin" }
   ];
 
   const handleCardClick = (item) => {
-    if (item.title === "Admin Login") {
-      setDialogOpen(true);
-    } else {
-      navigate(item.path);
-    }
+    navigate(item.path);
   };
 
   return (
@@ -56,13 +49,6 @@ function MainMenu() {
           </Grid>
         ))}
       </Grid>
-
-      {/* Admin login dialog */}
-      <AdminLoginDialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        onSuccess={() => navigate('/Admin')}
-      />
     </Container>
   );
 }

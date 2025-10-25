@@ -1,26 +1,26 @@
 import { createTheme } from '@mui/material/styles';
-import { orange, deepPurple, grey } from '@mui/material/colors';
+import { orange, deepPurple, grey, blue } from '@mui/material/colors';
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: orange[700], // A vibrant orange/amber for primary actions
+      main: orange[700],
       light: orange[300],
       dark: orange[900],
       contrastText: '#fff',
     },
     secondary: {
-      main: deepPurple[500], // Deep purple for secondary elements
+      main: deepPurple[500],
       light: deepPurple[300],
       dark: deepPurple[700],
       contrastText: '#fff',
     },
     background: {
-      default: grey[50], // Very light grey for main page background, emulating the ad's background
-      paper: '#fff',     // White for card/paper backgrounds
+      default: grey[50],
+      paper: '#fff',
     },
     text: {
-      primary: grey[900], // Dark grey for general text
+      primary: blue[900],
       secondary: grey[700],
     },
   },
@@ -28,7 +28,7 @@ const theme = createTheme({
     h1: {
       fontSize: '2.5rem',
       fontWeight: 700,
-      color: deepPurple[700], // Use a darker purple for main titles
+      color: deepPurple[700],
       borderBottom: `2px solid ${deepPurple[100]}`,
       paddingBottom: 10,
       marginBottom: 20,
@@ -36,7 +36,7 @@ const theme = createTheme({
     h2: {
       fontSize: '1.8rem',
       fontWeight: 600,
-      color: orange[700], // Use orange for section titles
+      color: orange[700],
       marginTop: 30,
       paddingBottom: 5,
       borderBottom: `1px dashed ${orange[100]}`,
@@ -50,9 +50,9 @@ const theme = createTheme({
     MuiRadio: {
       styleOverrides: {
         root: {
-          color: deepPurple[400], // Default color for unchecked radio
+          color: deepPurple[400],
           '&.Mui-checked': {
-            color: orange[700], // Color when checked
+            color: orange[700],
           },
         },
       },
@@ -62,8 +62,11 @@ const theme = createTheme({
         root: {
           marginTop: 20,
           backgroundColor: orange[700],
+          color: '#000', // Black text for all buttons
+          fontWeight: 600, // Bold text globally
           '&:hover': {
             backgroundColor: orange[800],
+            color: '#000', // Keep hover text black
           },
         },
       },

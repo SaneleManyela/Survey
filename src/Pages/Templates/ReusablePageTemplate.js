@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ThemeProvider } from "@mui/material/styles";
-import theme from "./theme.js";
+import theme from "../theme.js";
 import {
   Container,
   Typography,
@@ -17,21 +17,16 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
-import { saveSurveyResponse } from "../db/dbStore.js";
+import { saveSurveyResponse } from "../../db/dbStore.js";
 
-// ===================== PAGE 5 =====================
-const leadershipQuestions = [
-  "I engage in and like arguments or conflicts at work.",
-  "I would appreciate feedback that is open and truthful, even if it is harsh.",
-  "My natural reaction when I'm insulted is to withdraw rather than react.",
-  "I feel that avoiding unnecessary disagreement is typically the best strategy.",
-  "Workplace conflict can either motivate or depress me.",
-  "When my department or team is compared to others, I feel competitive.",
-  "I like the challenge of work competitions or 'turf wars.'",
-  "When someone is nasty to me, I usually feel forced to return the favor."
-];
-
-export function Page4() {
+/**
+ * Reusable survey page component
+ * @param {string} pageTitle - Title of the page
+ * @param {string} pageKey - Firestore key for this page (e.g., "page5")
+ * @param {string[]} questions - Array of questions for this page
+ * @param {number[]} options - Array of selectable options (true/false = ["true","false"], Likert = [1,2,3,4,5])
+ */
+export function SurveyPage({ pageTitle, pageKey, questions, options }) {
   const [answers, setAnswers] = useState({});
   const [showPopup, setShowPopup] = useState(false);
   const userId = "anonymous"; // Replace with real user ID if available
@@ -40,11 +35,11 @@ export function Page4() {
     const updatedAnswers = { ...answers, [index]: value };
     setAnswers(updatedAnswers);
 
-    // Save page responses to Firestore
-    await saveSurveyResponse(userId, { page: "page4", answers: updatedAnswers });
+    // Save responses to Firestore
+    await saveSurveyResponse(userId, { page: pageKey, answers: updatedAnswers });
 
     // Show pop-up if last question
-    if (index === leadershipQuestions.length - 1) {
+    if (index === questions.length - 1) {
       setShowPopup(true);
     }
   };
@@ -71,32 +66,29 @@ export function Page4() {
           Home
         </Button>
 
-        <Typography variant="h1">Assessing One's Leadership: Potential towards Conflict</Typography>
-        <Typography variant="body1" gutterBottom>
-          <strong>Instructions:</strong> Indicate the extent to which each statement describes your attitude or behavior by selecting one number. 1 = Very Inaccurate (VI) | 2 = Moderately Inaccurate (MI) | 3 = Neither Accurate nor Inaccurate (N) | 4 = Moderately Accurate (MA) | 5 = Very Accurate (VA)
-        </Typography>
+        <Typography variant="h1">{pageTitle}</Typography>
 
         <Paper>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell>Statement</TableCell>
-                {[1, 2, 3, 4, 5].map((num) => (
-                  <TableCell key={num} align="center">{num}</TableCell>
+                {options.map((opt) => (
+                  <TableCell key={opt} align="center">{opt}</TableCell>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              {leadershipQuestions.map((q, index) => (
+              {questions.map((q, index) => (
                 <TableRow key={index}>
                   <TableCell>{q}</TableCell>
-                  {[1, 2, 3, 4, 5].map((num) => (
-                    <TableCell key={num} align="center">
+                  {options.map((opt) => (
+                    <TableCell key={opt} align="center">
                       <Radio
-                        checked={answers[index] === num.toString()}
-                        onChange={() => handleRadioChange(index, num.toString())}
-                        value={num.toString()}
-                        name={`cp${index + 1}`}
+                        checked={answers[index] === opt.toString()}
+                        onChange={() => handleRadioChange(index, opt.toString())}
+                        value={opt.toString()}
+                        name={`${pageKey}_${index}`}
                       />
                     </TableCell>
                   ))}

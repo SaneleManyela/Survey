@@ -1,10 +1,23 @@
-import { useState } from 'react';
-import { ThemeProvider } from '@mui/material/styles';
-import theme from './theme.js';
-import { Container, Typography, Paper, Table, TableHead, TableRow, TableCell, TableBody, Radio, Button } from '@mui/material';
-import { Link } from 'react-router-dom';
-import HomeIcon from '@mui/icons-material/Home';
-import { saveSurveyResponse } from '../db/dbStore.js';
+import { useState } from "react";
+import { ThemeProvider } from "@mui/material/styles";
+import theme from "./theme.js";
+import {
+  Container,
+  Typography,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Radio,
+  Button,
+  Dialog,
+  DialogContent,
+} from "@mui/material";
+import { Link } from "react-router-dom";
+import HomeIcon from "@mui/icons-material/Home";
+import { saveSurveyResponse } from "../db/dbStore.js";
 
 // ===================== PAGE 2 =====================
 const questionsSurvey1 = [
@@ -21,14 +34,20 @@ const questionsSurvey1 = [
 
 export function Page1() {
   const [answers, setAnswers] = useState({});
+  const [showPopup, setShowPopup] = useState(false);
   const userId = "anonymous"; // Replace with real user ID if available
 
   const handleRadioChange = async (index, value) => {
     const updatedAnswers = { ...answers, [index]: value };
     setAnswers(updatedAnswers);
 
-    // Save to Firestore (only this page's answers)
-    await saveSurveyResponse(userId, { page1: updatedAnswers });
+    // Save page responses to Firestore
+    await saveSurveyResponse(userId, { page: "page1", answers: updatedAnswers });
+
+    // Show pop-up if last question
+    if (index === questionsSurvey1.length - 1) {
+      setShowPopup(true);
+    }
   };
 
   return (
@@ -41,18 +60,20 @@ export function Page1() {
           startIcon={<HomeIcon />}
           sx={{
             mb: 2,
-            color: 'black',
-            fontWeight: 'bold',
-            borderColor: 'black',
-            '&:hover': {
-              borderColor: 'black',
-              backgroundColor: '#f5f5f5'
-            }
+            color: "black",
+            fontWeight: "bold",
+            borderColor: "black",
+            "&:hover": {
+              borderColor: "black",
+              backgroundColor: "#f5f5f5",
+            },
           }}
         >
           Home
         </Button>
+
         <Typography variant="h1">Excellent Speaking and Writing Strategies</Typography>
+
         <Paper>
           <Table>
             <TableHead>
@@ -72,7 +93,6 @@ export function Page1() {
                       onChange={() => handleRadioChange(index, "true")}
                       value="true"
                       name={`q${index + 12}`}
-                      color="primary"
                     />
                   </TableCell>
                   <TableCell align="center">
@@ -81,7 +101,6 @@ export function Page1() {
                       onChange={() => handleRadioChange(index, "false")}
                       value="false"
                       name={`q${index + 12}`}
-                      color="primary"
                     />
                   </TableCell>
                 </TableRow>
@@ -89,6 +108,20 @@ export function Page1() {
             </TableBody>
           </Table>
         </Paper>
+
+        {/* Pop-up dialog for last radio */}
+        <Dialog open={showPopup} onClose={() => setShowPopup(false)}>
+          <DialogContent sx={{ display: "flex", justifyContent: "center", padding: 4 }}>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={() => setShowPopup(false)}
+              sx={{ fontSize: 24, width: 80, height: 80, borderRadius: 2 }}
+            >
+              ✅
+            </Button>
+          </DialogContent>
+        </Dialog>
       </Container>
     </ThemeProvider>
   );

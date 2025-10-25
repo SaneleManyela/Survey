@@ -1,50 +1,52 @@
-import express from 'express';
-import { Low } from 'lowdb';
-import { JSONFile } from 'lowdb/node';
-import { nanoid } from 'nanoid';
-import nodemailer from 'nodemailer';
+// routesFirestore.js
+import express from "express";
+import { db } from "../index.js"; // Make sure db is exported from index.js
+import { nanoid } from "nanoid";
+import nodemailer from "nodemailer";
 
 const router = express.Router();
 
-// Configure lowdb
-const adapter = new JSONFile('db.json');
-const db = new Low(adapter, { surveyResponses: [], adminPassword: { password: '', expiresAt: null } });
-
-// Initialize database
-await db.read();
-db.data ||= { surveyResponses: [], adminPassword: { password: '', expiresAt: null } };
-await db.write();
-
 /**
- * Save a survey response
+ * Save a survey response (per page)
  * POST /api/saveSurvey
- * body: { userId, responses }
+ * body: { userId, page, answers }
  */
-router.post('/saveSurvey', async (req, res) => {
-  const { userId, responses } = req.body;
+router.post("/saveSurvey", async (req, res) => {
+  const { userId, page, answers } = req.body;
+  if (!userId || !page || !answers)
+    return res.status(400).json({ success: false, error: "Missing required fields" });
 
-  if (!userId || !responses)
-    return res.status(400).json({ success: false, error: 'Missing userId or responses' });
+  try {
+    const userDocRef = db.collection("surveyResponses").doc(userId);
 
-  await db.read();
-  db.data.surveyResponses.push({
-    id: nanoid(),
-    userId,
-    responses,
-    timestamp: new Date().toISOString(),
-  });
-  await db.write();
+    await userDocRef.set(
+      {
+        [page]: answers,
+        updatedAt: new Date().toISOString(),
+      },
+      { merge: true } // merge prevents overwriting other pages
+    );
 
-  res.json({ success: true });
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Error saving survey to Firestore:", err);
+    res.status(500).json({ success: false, error: String(err) });
+  }
 });
 
 /**
  * Get all survey responses
  * GET /api/allSurveys
  */
-router.get('/allSurveys', async (req, res) => {
-  await db.read();
-  res.json(db.data.surveyResponses);
+router.get("/allSurveys", async (req, res) => {
+  try {
+    const snapshot = await db.collection("surveyResponses").get();
+    const allResponses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    res.json(allResponses);
+  } catch (err) {
+    console.error("Error fetching surveys:", err);
+    res.status(500).json({ success: false, error: String(err) });
+  }
 });
 
 /**
@@ -52,24 +54,22 @@ router.get('/allSurveys', async (req, res) => {
  * POST /api/adminPassword
  * body: { password, expiresAt }
  */
-router.post('/adminPassword', async (req, res) => {
+router.post("/adminPassword", async (req, res) => {
   const { password, expiresAt } = req.body;
   if (!password)
-    return res.status(400).json({ success: false, error: 'Missing password' });
+    return res.status(400).json({ success: false, error: "Missing password" });
 
-  await db.read();
-  db.data.adminPassword = {
-    password,
-    expiresAt: expiresAt || new Date().toISOString(),
-  };
-  await db.write();
-
-  // --- Email the password using SMTP ---
   try {
+    await db.collection("admin").doc("password").set({
+      password,
+      expiresAt: expiresAt || new Date().toISOString(),
+    });
+
+    // Send email
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT || 587),
-      secure: Number(process.env.SMTP_PORT) === 465, // true for 465, false otherwise
+      secure: Number(process.env.SMTP_PORT) === 465,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
@@ -79,20 +79,14 @@ router.post('/adminPassword', async (req, res) => {
     await transporter.sendMail({
       from: process.env.SENDER_EMAIL,
       to: process.env.ADMIN_NOTIFY_EMAIL,
-      subject: 'Survey Admin Password',
-      text: `Your admin password is: ${password}\n\nExpires: ${
-        db.data.adminPassword.expiresAt
-      }`,
-      html: `<h3>Your admin password</h3>
-             <p><b>${password}</b></p>
-             <p>Expires: ${db.data.adminPassword.expiresAt}</p>`,
+      subject: "Survey Admin Password",
+      text: `Your admin password is: ${password}\nExpires: ${expiresAt || new Date().toISOString()}`,
     });
 
-    console.log('✅ Admin password email sent successfully.');
-    res.json({ success: true, emailSent: true });
+    res.json({ success: true });
   } catch (err) {
-    console.error('❌ Failed to send admin password email:', err);
-    res.json({ success: true, emailSent: false, error: String(err) });
+    console.error("Error saving admin password:", err);
+    res.status(500).json({ success: false, error: String(err) });
   }
 });
 
@@ -100,9 +94,14 @@ router.post('/adminPassword', async (req, res) => {
  * Get admin password
  * GET /api/adminPassword
  */
-router.get('/adminPassword', async (req, res) => {
-  await db.read();
-  res.json({ password: db.data.adminPassword.password || null });
+router.get("/adminPassword", async (req, res) => {
+  try {
+    const doc = await db.collection("admin").doc("password").get();
+    res.json({ password: doc.exists ? doc.data().password : null });
+  } catch (err) {
+    console.error("Error fetching admin password:", err);
+    res.status(500).json({ password: null, error: String(err) });
+  }
 });
 
 export default router;

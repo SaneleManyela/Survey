@@ -1,10 +1,21 @@
-import { useState } from 'react';
-import { ThemeProvider } from '@mui/material/styles';
-import theme from './theme.js';
-import { Container, Typography, Paper, Table, TableHead, TableRow, TableCell, TableBody, Radio, Button } from '@mui/material';
-import { Link } from 'react-router-dom';
-import HomeIcon from '@mui/icons-material/Home';
-import { saveSurveyResponse } from '../db/dbStore.js';
+import { useState } from "react";
+import { ThemeProvider } from "@mui/material/styles";
+import theme from "./theme.js";
+import {
+  Container,
+  Typography,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Radio,
+  Button,
+  Dialog,
+  DialogContent,
+} from "@mui/material";
+import { saveSurveyResponse } from "../db/dbStore.js";
 
 const questionsSurvey0 = [
   "Typically, when I speak in a group, others tend to pause and listen.",
@@ -21,44 +32,27 @@ const questionsSurvey0 = [
 ];
 
 export function Page0() {
-  // Track answers in state
   const [answers, setAnswers] = useState({});
-  const userId = "anonymous"; // Replace with real user ID if available
+  const [showPopup, setShowPopup] = useState(false);
+  const userId = "anonymous"; // replace with real user id
 
-  // Handle radio change and save to Firestore
   const handleRadioChange = async (index, value) => {
     const updatedAnswers = { ...answers, [index]: value };
     setAnswers(updatedAnswers);
 
-    // Save to Firestore (only this page's answers)
-    await saveSurveyResponse(userId, { page0: updatedAnswers });
+    // Save page responses
+    await saveSurveyResponse(userId, { page: "page0", answers: updatedAnswers });
+
+    // Show pop-up if last question
+    if (index === questionsSurvey0.length - 1) {
+      setShowPopup(true);
+    }
   };
 
   return (
     <ThemeProvider theme={theme}>
       <Container maxWidth="md">
-        <Button
-          component={Link}
-          to="/"
-          variant="outlined"
-          startIcon={<HomeIcon />}
-          sx={{
-            mb: 2,
-            color: 'black',
-            fontWeight: 'bold',
-            borderColor: 'black',
-            '&:hover': {
-              borderColor: 'black',
-              backgroundColor: '#f5f5f5'
-            }
-          }}
-        >
-          Home
-        </Button>
         <Typography variant="h1">Foundations of Communication Style</Typography>
-        <Typography variant="body1" gutterBottom>
-          <strong>Instructions:</strong> Please indicate whether the following statements are <strong>Mostly True</strong> or <strong>Mostly False</strong> in relation to your personal communication style.
-        </Typography>
         <Paper>
           <Table>
             <TableHead>
@@ -76,18 +70,16 @@ export function Page0() {
                     <Radio
                       checked={answers[index] === "true"}
                       onChange={() => handleRadioChange(index, "true")}
+                      name={`q${index}`}
                       value="true"
-                      name={`q${index + 1}`}
-                      color="primary"
                     />
                   </TableCell>
                   <TableCell align="center">
                     <Radio
                       checked={answers[index] === "false"}
                       onChange={() => handleRadioChange(index, "false")}
+                      name={`q${index}`}
                       value="false"
-                      name={`q${index + 1}`}
-                      color="primary"
                     />
                   </TableCell>
                 </TableRow>
@@ -95,6 +87,20 @@ export function Page0() {
             </TableBody>
           </Table>
         </Paper>
+
+        {/* Pop-up dialog for last radio */}
+        <Dialog open={showPopup} onClose={() => setShowPopup(false)}>
+          <DialogContent sx={{ display: "flex", justifyContent: "center", padding: 4 }}>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={() => setShowPopup(false)}
+              sx={{ fontSize: 24, width: 80, height: 80, borderRadius: 2 }}
+            >
+              ✅
+            </Button>
+          </DialogContent>
+        </Dialog>
       </Container>
     </ThemeProvider>
   );
