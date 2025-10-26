@@ -1,7 +1,5 @@
-// routesFirestore.js
 import express from "express";
-import { db } from "../server.js"; // Make sure db is exported from index.js
-import { nanoid } from "nanoid";
+import { db } from "../server.js"; // db imported from server.js
 import nodemailer from "nodemailer";
 
 const router = express.Router();
@@ -24,7 +22,7 @@ router.post("/saveSurvey", async (req, res) => {
         [page]: answers,
         updatedAt: new Date().toISOString(),
       },
-      { merge: true } // merge prevents overwriting other pages
+      { merge: true }
     );
 
     res.json({ success: true });
