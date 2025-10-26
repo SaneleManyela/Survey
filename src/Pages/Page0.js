@@ -49,8 +49,7 @@ export function Page0() {
       console.log("Saving survey response...", { userId, page: "page0", answers });
       const result = await saveSurveyResponse(userId, { page: "page0", answers });
       console.log("Save result:", result);
-      if (result.success) setShowPopup(true);
-      else alert("Failed to save your responses: " + result.error);
+      if (!result.success) alert("Failed to save your responses: " + result.error);
     } catch (err) {
       console.error("Error saving response:", err);
       alert("Failed to save your responses. Please try again.");
