@@ -125,31 +125,6 @@ export function Page4() {
         >
           {isSaving ? "Saving..." : "Save Responses"}
         </Button>
-
-        {/* ✅ Pop-up dialog when saved */}
-        <Dialog
-          open={showPopup}
-          onClose={() => setShowPopup(false)}
-          PaperProps={{ sx: { borderRadius: 0, width: 160, height: 160 } }}
-        >
-          <DialogContent
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            <Button
-              variant="contained"
-              color="success"
-              onClick={() => setShowPopup(false)}
-              sx={{ fontSize: 36, width: 80, height: 80, borderRadius: 2 }}
-            >
-              ✅
-            </Button>
-          </DialogContent>
-        </Dialog>
       </Container>
     </ThemeProvider>
   );
