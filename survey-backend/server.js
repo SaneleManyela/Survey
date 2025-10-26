@@ -23,12 +23,11 @@ app.use(cors(corsOptions));
 /**
  * ✅ Handle all OPTIONS (preflight) requests
  */
-app.options("/", (req, res, next) => {
+app.options(/.*/, (req, res) => {
   res.header("Access-Control-Allow-Origin", "https://sanelemanyela.github.io");
   res.header("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
-  if (req.method === "OPTIONS") return res.sendStatus(204);
-  next();
+  res.sendStatus(204);
 });
 
 /**
@@ -37,28 +36,42 @@ app.options("/", (req, res, next) => {
 app.use(express.json());
 
 /**
- * ✅ Initialize Firebase Admin
+ * ✅ Initialize Firebase Admin safely for Render
  */
-if (!admin.apps.length) {
-  const serviceAccount = {
-    type: process.env.FIREBASE_TYPE,
-    project_id: process.env.FIREBASE_PROJECT_ID,
-    private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-    private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-    client_email: process.env.FIREBASE_CLIENT_EMAIL,
-    client_id: process.env.FIREBASE_CLIENT_ID,
-    auth_uri: process.env.FIREBASE_AUTH_URI,
-    token_uri: process.env.FIREBASE_TOKEN_URI,
-    auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
-    client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
-  };
+try {
+  if (!admin.apps.length) {
+    if (!process.env.FIREBASE_PROJECT_ID) {
+      console.error("❌ Missing Firebase environment variables");
+      throw new Error("Missing Firebase configuration in environment");
+    }
 
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
+    const serviceAccount = {
+      type: process.env.FIREBASE_TYPE,
+      project_id: process.env.FIREBASE_PROJECT_ID,
+      private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+      private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+      client_email: process.env.FIREBASE_CLIENT_EMAIL,
+      client_id: process.env.FIREBASE_CLIENT_ID,
+      auth_uri: process.env.FIREBASE_AUTH_URI,
+      token_uri: process.env.FIREBASE_TOKEN_URI,
+      auth_provider_x509_cert_url:
+        process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
+      client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
+    };
+
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+
+    console.log(`✅ Firebase initialized for project: ${serviceAccount.project_id}`);
+  }
+} catch (error) {
+  console.error("🔥 Firebase Admin initialization failed:", error);
 }
 
-// ✅ Export db so routes can import it
+/**
+ * ✅ Firestore reference
+ */
 export const db = admin.firestore();
 
 /**
