@@ -1,16 +1,15 @@
 import express from "express";
 import cors from "cors";
 import admin from "firebase-admin";
-import { nanoid } from "nanoid";
 import dotenv from "dotenv";
-import surveyRoutes from "./routes/routes.js"; // Routes file
+import surveyRoutes from "./routes/routes.js";
 
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 /**
- * ✅ 1. Global CORS configuration
+ * ✅ Global CORS configuration
  */
 const corsOptions = {
   origin: "https://sanelemanyela.github.io",
@@ -22,7 +21,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 /**
- * ✅ 2. Handle all OPTIONS (preflight) requests
+ * ✅ Handle all OPTIONS (preflight) requests
  */
 app.options(/.*/, (req, res, next) => {
   res.header("Access-Control-Allow-Origin", "https://sanelemanyela.github.io");
@@ -33,12 +32,12 @@ app.options(/.*/, (req, res, next) => {
 });
 
 /**
- * ✅ 3. Parse JSON bodies
+ * ✅ Parse JSON bodies
  */
 app.use(express.json());
 
 /**
- * ✅ 4. Initialize Firebase Admin
+ * ✅ Initialize Firebase Admin
  */
 if (!admin.apps.length) {
   const serviceAccount = {
@@ -59,16 +58,16 @@ if (!admin.apps.length) {
   });
 }
 
-// ✅ Firestore instance, kept in server.js
+// ✅ Export db so routes can import it
 export const db = admin.firestore();
 
 /**
- * ✅ 5. Routes
+ * ✅ Routes
  */
 app.use("/api", surveyRoutes);
 
 /**
- * ✅ 6. Test route
+ * ✅ Test route
  */
 app.get("/", (req, res) => {
   res.header("Access-Control-Allow-Origin", "https://sanelemanyela.github.io");
@@ -76,7 +75,7 @@ app.get("/", (req, res) => {
 });
 
 /**
- * ✅ 7. Start server
+ * ✅ Start server
  */
 app.listen(PORT, () => {
   console.log(`🚀 Survey backend running on port ${PORT}`);
