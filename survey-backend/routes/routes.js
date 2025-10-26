@@ -1,6 +1,6 @@
 // routesFirestore.js
 import express from "express";
-import { db } from "../index.js"; // Make sure db is exported from index.js
+import { db } from "../server.js"; // Make sure db is exported from index.js
 import { nanoid } from "nanoid";
 import nodemailer from "nodemailer";
 
