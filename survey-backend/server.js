@@ -23,7 +23,7 @@ app.use(cors(corsOptions));
 /**
  * ✅ Handle all OPTIONS (preflight) requests
  */
-app.options(/.*/, (req, res, next) => {
+app.options("/", (req, res, next) => {
   res.header("Access-Control-Allow-Origin", "https://sanelemanyela.github.io");
   res.header("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
