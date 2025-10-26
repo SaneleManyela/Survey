@@ -12,8 +12,6 @@ import {
   TableBody,
   Radio,
   Button,
-  Dialog,
-  DialogContent,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
@@ -35,7 +33,6 @@ const leadershipQuestions = [
 
 export function Page3() {
   const [answers, setAnswers] = useState({});
-  const [showPopup, setShowPopup] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const userId = "anonymous"; // TODO: replace with auth.uid when integrating
 
@@ -48,8 +45,10 @@ export function Page3() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await saveSurveyResponse(userId, { page: "page3", answers });
-      setShowPopup(true);
+      console.log("Saving survey response...", { userId, page: "page3", answers });
+      const result = await saveSurveyResponse(userId, { page: "page3", answers });
+      console.log("Save result:", result);
+      if (!result.success) alert("Failed to save your responses: " + result.error);
     } catch (err) {
       console.error("Error saving response:", err);
       alert("Failed to save your responses. Please try again.");

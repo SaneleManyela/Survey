@@ -1,12 +1,13 @@
 const API_URL = 'https://survey-u3s9.onrender.com/api'; // Update with your deployed URL
 
-export async function saveSurveyResponse(userId, responses) {
+export async function saveSurveyResponse(userId, { page, answers }) {
   try {
     const res = await fetch(`${API_URL}/saveSurvey`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, responses })
+      body: JSON.stringify({ userId, page, answers })
     });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (error) {
     console.error('Error saving survey response:', error);
@@ -17,6 +18,7 @@ export async function saveSurveyResponse(userId, responses) {
 export async function getAllSurveyResponses() {
   try {
     const res = await fetch(`${API_URL}/allSurveys`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (error) {
     console.error('Error fetching responses:', error);

@@ -12,8 +12,6 @@ import {
   TableBody,
   Radio,
   Button,
-  Dialog,
-  DialogContent,
 } from "@mui/material";
 import { Link } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
@@ -36,10 +34,9 @@ const questionsSurvey0 = [
 
 export function Page0() {
   const [answers, setAnswers] = useState({});
-  const [showPopup, setShowPopup] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const userId = "anonymous"; // TODO: replace with auth.uid when integrating
-
+  const userId = "anonymous"; 
+  
   // ✅ Radio buttons only update local state
   const handleRadioChange = (index, value) => {
     setAnswers(prev => ({ ...prev, [index]: value }));
@@ -49,8 +46,11 @@ export function Page0() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await saveSurveyResponse(userId, { page: "page0", answers });
-      setShowPopup(true);
+      console.log("Saving survey response...", { userId, page: "page0", answers });
+      const result = await saveSurveyResponse(userId, { page: "page0", answers });
+      console.log("Save result:", result);
+      if (result.success) setShowPopup(true);
+      else alert("Failed to save your responses: " + result.error);
     } catch (err) {
       console.error("Error saving response:", err);
       alert("Failed to save your responses. Please try again.");
