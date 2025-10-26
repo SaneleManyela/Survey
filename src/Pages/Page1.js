@@ -41,10 +41,16 @@ export function Page1() {
     const updatedAnswers = { ...answers, [index]: value };
     setAnswers(updatedAnswers);
 
-    // Save page responses to Firestore
-    await saveSurveyResponse(userId, { page: "page1", answers: updatedAnswers });
+    try {
+      await saveSurveyResponse(userId, {
+        page: "page1",
+        answers: updatedAnswers,
+      });
+    } catch (err) {
+      console.error("Error saving response:", err);
+    }
 
-    // Show pop-up if last question
+    // Show ✅ popup only on last question
     if (index === questionsSurvey1.length - 1) {
       setShowPopup(true);
     }
@@ -71,8 +77,9 @@ export function Page1() {
         >
           Home
         </Button>
-
-        <Typography variant="h1">Excellent Speaking and Writing Strategies</Typography>
+        <Typography variant="h1" gutterBottom>
+          Excellent Speaking and Writing Strategies
+        </Typography>
 
         <Paper>
           <Table>
@@ -108,15 +115,32 @@ export function Page1() {
             </TableBody>
           </Table>
         </Paper>
-
-        {/* Pop-up dialog for last radio */}
-        <Dialog open={showPopup} onClose={() => setShowPopup(false)}>
-          <DialogContent sx={{ display: "flex", justifyContent: "center", padding: 4 }}>
+        {/* ✅ Pop-up dialog when last question answered */}
+        <Dialog
+          open={showPopup}
+          onClose={() => setShowPopup(false)}
+          PaperProps={{
+            sx: { borderRadius: 0, width: 160, height: 160 }, // square dialog
+          }}
+        >
+          <DialogContent
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
             <Button
               variant="contained"
               color="success"
               onClick={() => setShowPopup(false)}
-              sx={{ fontSize: 24, width: 80, height: 80, borderRadius: 2 }}
+              sx={{
+                fontSize: 36,
+                width: 80,
+                height: 80,
+                borderRadius: 2,
+              }}
             >
               ✅
             </Button>

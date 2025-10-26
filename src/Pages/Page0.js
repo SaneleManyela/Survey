@@ -15,8 +15,11 @@ import {
   Dialog,
   DialogContent,
 } from "@mui/material";
+import { Link } from 'react-router-dom';
+import HomeIcon from '@mui/icons-material/Home';
 import { saveSurveyResponse } from "../db/dbStore.js";
 
+// ===================== PAGE 1 =====================
 const questionsSurvey0 = [
   "Typically, when I speak in a group, others tend to pause and listen.",
   "My written work, such as emails and social media posts, consistently receives excellent responses.",
@@ -28,22 +31,28 @@ const questionsSurvey0 = [
   "Any time I tell a joke or a comment that I find funny, people usually chuckle.",
   "I keep myself informed by watching news shows on television or reading news articles online.",
   "My voice and gestures have been described as enthusiastic, vibrant, colorful, and dynamic by others.",
-  "I usually send text messages with better grammar and spelling than I receive."
+  "I usually send text messages with better grammar and spelling than I receive.",
 ];
 
 export function Page0() {
   const [answers, setAnswers] = useState({});
   const [showPopup, setShowPopup] = useState(false);
-  const userId = "anonymous"; // replace with real user id
+  const userId = "anonymous"; // TODO: replace with auth.uid when integrating
 
   const handleRadioChange = async (index, value) => {
     const updatedAnswers = { ...answers, [index]: value };
     setAnswers(updatedAnswers);
 
-    // Save page responses
-    await saveSurveyResponse(userId, { page: "page0", answers: updatedAnswers });
+    try {
+      await saveSurveyResponse(userId, {
+        page: "page0",
+        answers: updatedAnswers,
+      });
+    } catch (err) {
+      console.error("Error saving response:", err);
+    }
 
-    // Show pop-up if last question
+    // Show ✅ popup only on last question
     if (index === questionsSurvey0.length - 1) {
       setShowPopup(true);
     }
@@ -51,9 +60,30 @@ export function Page0() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container maxWidth="md">
-        <Typography variant="h1">Foundations of Communication Style</Typography>
-        <Paper>
+      <Container maxWidth="md" sx={{ mt: 4 }}>
+        <Button
+          component={Link}
+          to="/"
+          variant="outlined"
+          startIcon={<HomeIcon />}
+          sx={{
+            mb: 2,
+            color: 'black',
+            fontWeight: 'bold',
+            borderColor: 'black',
+            '&:hover': {
+              borderColor: 'black',
+              backgroundColor: '#f5f5f5'
+            }
+          }}
+        >
+          Home
+        </Button>
+        <Typography variant="h1" gutterBottom>
+          Foundations of Communication Style
+        </Typography>
+
+        <Paper sx={{ p: 3 }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -88,14 +118,32 @@ export function Page0() {
           </Table>
         </Paper>
 
-        {/* Pop-up dialog for last radio */}
-        <Dialog open={showPopup} onClose={() => setShowPopup(false)}>
-          <DialogContent sx={{ display: "flex", justifyContent: "center", padding: 4 }}>
+        {/* ✅ Pop-up dialog when last question answered */}
+        <Dialog
+          open={showPopup}
+          onClose={() => setShowPopup(false)}
+          PaperProps={{
+            sx: { borderRadius: 0, width: 160, height: 160 }, // square dialog
+          }}
+        >
+          <DialogContent
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
             <Button
               variant="contained"
               color="success"
               onClick={() => setShowPopup(false)}
-              sx={{ fontSize: 24, width: 80, height: 80, borderRadius: 2 }}
+              sx={{
+                fontSize: 36,
+                width: 80,
+                height: 80,
+                borderRadius: 2,
+              }}
             >
               ✅
             </Button>

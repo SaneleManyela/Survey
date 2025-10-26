@@ -38,17 +38,23 @@ export function Page2() {
   const userId = "anonymous"; // Replace with real user ID if available
 
   const handleRadioChange = async (index, value) => {
-    const updatedAnswers = { ...answers, [index]: value };
-    setAnswers(updatedAnswers);
-
-    // Save page responses to Firestore
-    await saveSurveyResponse(userId, { page: "page2", answers: updatedAnswers });
-
-    // Show pop-up if last question
-    if (index === conflictQuestions.length - 1) {
-      setShowPopup(true);
-    }
-  };
+      const updatedAnswers = { ...answers, [index]: value };
+      setAnswers(updatedAnswers);
+  
+      try {
+        await saveSurveyResponse(userId, {
+          page: "page2",
+          answers: updatedAnswers,
+        });
+      } catch (err) {
+        console.error("Error saving response:", err);
+      }
+  
+      // Show ✅ popup only on last question
+      if (index === conflictQuestions.length - 1) {
+        setShowPopup(true);
+      }
+    };
 
   return (
     <ThemeProvider theme={theme}>
@@ -71,13 +77,14 @@ export function Page2() {
         >
           Home
         </Button>
-
-        <Typography variant="h1">Fundamentals of Persuasion and Influence</Typography>
+        <Typography variant="h1" gutterBottom>
+          Fundamentals of Persuasion and Influence
+        </Typography>
         <Typography variant="body1" gutterBottom>
           <strong>Instructions:</strong> Please indicate whether the following statements are <strong>Mostly True</strong> or <strong>Mostly False</strong> regarding how you generally approach conflict and negotiation.
         </Typography>
 
-        <Paper>
+        <Paper sx={{ p: 3 }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -110,16 +117,33 @@ export function Page2() {
               ))}
             </TableBody>
           </Table>
-        </Paper>
-
-        {/* Pop-up dialog for last radio */}
-        <Dialog open={showPopup} onClose={() => setShowPopup(false)}>
-          <DialogContent sx={{ display: "flex", justifyContent: "center", padding: 4 }}>
+        </Paper>        
+        {/* ✅ Pop-up dialog when last question answered */}
+        <Dialog
+          open={showPopup}
+          onClose={() => setShowPopup(false)}
+          PaperProps={{
+            sx: { borderRadius: 0, width: 160, height: 160 }, // square dialog
+          }}
+        >
+          <DialogContent
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
             <Button
               variant="contained"
               color="success"
               onClick={() => setShowPopup(false)}
-              sx={{ fontSize: 24, width: 80, height: 80, borderRadius: 2 }}
+              sx={{
+                fontSize: 36,
+                width: 80,
+                height: 80,
+                borderRadius: 2,
+              }}
             >
               ✅
             </Button>
