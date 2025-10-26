@@ -36,30 +36,31 @@ const leadershipQuestions = [
 export function Page3() {
   const [answers, setAnswers] = useState({});
   const [showPopup, setShowPopup] = useState(false);
-  const userId = "anonymous"; // Replace with real user ID if available
+  const [isSaving, setIsSaving] = useState(false);
+  const userId = "anonymous"; // TODO: replace with auth.uid when integrating
 
-  const handleRadioChange = async (index, value) => {
-    const updatedAnswers = { ...answers, [index]: value };
-    setAnswers(updatedAnswers);
+  // ✅ Radio buttons only update local state
+  const handleRadioChange = (index, value) => {
+    setAnswers(prev => ({ ...prev, [index]: value }));
+  };
 
+  // ✅ Save button explicitly calls saveSurveyResponse
+  const handleSave = async () => {
+    setIsSaving(true);
     try {
-      await saveSurveyResponse(userId, {
-        page: "page0",
-        answers: updatedAnswers,
-      });
+      await saveSurveyResponse(userId, { page: "page3", answers });
+      setShowPopup(true);
     } catch (err) {
       console.error("Error saving response:", err);
-    }
-
-    // Show ✅ popup only on last question
-    if (index === leadershipQuestions.length - 1) {
-      setShowPopup(true);
+      alert("Failed to save your responses. Please try again.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <Container maxWidth="md">
+      <Container maxWidth="md" sx={{ mt: 4 }}>
         <Button
           component={Link}
           to="/"
@@ -78,7 +79,7 @@ export function Page3() {
         >
           Home
         </Button>
-        
+
         <Typography variant="h1" gutterBottom>
           Style of Conflict Resolution Self-Evaluation
         </Typography>
@@ -86,15 +87,13 @@ export function Page3() {
           <strong>Instructions:</strong> Indicate the extent to which each statement describes your attitude or behavior by selecting one number. 1 = Very Inaccurate (VI) | 2 = Moderately Inaccurate (MI) | 3 = Neither Accurate nor Inaccurate (N) | 4 = Moderately Accurate (MA) | 5 = Very Accurate (VA)
         </Typography>
 
-        <Paper>
+        <Paper sx={{ p: 3 }}>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell>Statement</TableCell>
                 {[1, 2, 3, 4, 5].map((num) => (
-                  <TableCell key={num} align="center">
-                    {num}
-                  </TableCell>
+                  <TableCell key={num} align="center">{num}</TableCell>
                 ))}
               </TableRow>
             </TableHead>
@@ -117,13 +116,23 @@ export function Page3() {
             </TableBody>
           </Table>
         </Paper>
-        {/* ✅ Pop-up dialog when last question answered */}
+
+        {/* ✅ Save Button */}
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSave}
+          disabled={isSaving}
+          sx={{ mt: 2, fontWeight: 'bold' }}
+        >
+          {isSaving ? "Saving..." : "Save Responses"}
+        </Button>
+
+        {/* ✅ Pop-up dialog when saved */}
         <Dialog
           open={showPopup}
           onClose={() => setShowPopup(false)}
-          PaperProps={{
-            sx: { borderRadius: 0, width: 160, height: 160 }, // square dialog
-          }}
+          PaperProps={{ sx: { borderRadius: 0, width: 160, height: 160 } }}
         >
           <DialogContent
             sx={{
@@ -137,12 +146,7 @@ export function Page3() {
               variant="contained"
               color="success"
               onClick={() => setShowPopup(false)}
-              sx={{
-                fontSize: 36,
-                width: 80,
-                height: 80,
-                borderRadius: 2,
-              }}
+              sx={{ fontSize: 36, width: 80, height: 80, borderRadius: 2 }}
             >
               ✅
             </Button>

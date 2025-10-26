@@ -35,30 +35,31 @@ const conflictQuestions = [
 export function Page2() {
   const [answers, setAnswers] = useState({});
   const [showPopup, setShowPopup] = useState(false);
-  const userId = "anonymous"; // Replace with real user ID if available
+  const [isSaving, setIsSaving] = useState(false);
+  const userId = "anonymous"; // TODO: replace with auth.uid when integrating
 
-  const handleRadioChange = async (index, value) => {
-      const updatedAnswers = { ...answers, [index]: value };
-      setAnswers(updatedAnswers);
-  
-      try {
-        await saveSurveyResponse(userId, {
-          page: "page2",
-          answers: updatedAnswers,
-        });
-      } catch (err) {
-        console.error("Error saving response:", err);
-      }
-  
-      // Show ✅ popup only on last question
-      if (index === conflictQuestions.length - 1) {
-        setShowPopup(true);
-      }
-    };
+  // ✅ Radio buttons only update local state
+  const handleRadioChange = (index, value) => {
+    setAnswers(prev => ({ ...prev, [index]: value }));
+  };
+
+  // ✅ Save button explicitly calls saveSurveyResponse
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await saveSurveyResponse(userId, { page: "page2", answers });
+      setShowPopup(true);
+    } catch (err) {
+      console.error("Error saving response:", err);
+      alert("Failed to save your responses. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <ThemeProvider theme={theme}>
-      <Container maxWidth="md">
+      <Container maxWidth="md" sx={{ mt: 4 }}>
         <Button
           component={Link}
           to="/"
@@ -77,6 +78,7 @@ export function Page2() {
         >
           Home
         </Button>
+
         <Typography variant="h1" gutterBottom>
           Fundamentals of Persuasion and Influence
         </Typography>
@@ -117,14 +119,24 @@ export function Page2() {
               ))}
             </TableBody>
           </Table>
-        </Paper>        
-        {/* ✅ Pop-up dialog when last question answered */}
+        </Paper>
+
+        {/* ✅ Save Button */}
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSave}
+          disabled={isSaving}
+          sx={{ mt: 2, fontWeight: 'bold' }}
+        >
+          {isSaving ? "Saving..." : "Save Responses"}
+        </Button>
+
+        {/* ✅ Pop-up dialog when saved */}
         <Dialog
           open={showPopup}
           onClose={() => setShowPopup(false)}
-          PaperProps={{
-            sx: { borderRadius: 0, width: 160, height: 160 }, // square dialog
-          }}
+          PaperProps={{ sx: { borderRadius: 0, width: 160, height: 160 } }}
         >
           <DialogContent
             sx={{
@@ -138,12 +150,7 @@ export function Page2() {
               variant="contained"
               color="success"
               onClick={() => setShowPopup(false)}
-              sx={{
-                fontSize: 36,
-                width: 80,
-                height: 80,
-                borderRadius: 2,
-              }}
+              sx={{ fontSize: 36, width: 80, height: 80, borderRadius: 2 }}
             >
               ✅
             </Button>
