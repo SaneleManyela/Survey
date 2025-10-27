@@ -59,6 +59,13 @@ try {
       client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
     };
 
+    console.log("🔍 Firebase Admin Config Preview:", {
+      project_id: process.env.FIREBASE_PROJECT_ID,
+      client_email: process.env.FIREBASE_CLIENT_EMAIL,
+      hasPrivateKey: !!process.env.FIREBASE_PRIVATE_KEY,
+      keySnippet: process.env.FIREBASE_PRIVATE_KEY?.substring(0, 40) + "..."
+    });
+
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
     });
