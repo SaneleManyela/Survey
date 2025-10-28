@@ -16,8 +16,8 @@ import {
 import { Link } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import { saveSurveyResponse } from "../db/dbStore.js";
+import { getUserId } from "../utils/userIdGenerator.js";
 
-// ===================== PAGE 3 =====================
 const conflictQuestions = [
   "My audience finds me to be highly educated and trustworthy about the subject matter at hand.",
   "I always change my voice and point of emphasis in order to suit the needs and interests of those listening.",
@@ -33,14 +33,12 @@ const conflictQuestions = [
 export function Page2() {
   const [answers, setAnswers] = useState({});
   const [isSaving, setIsSaving] = useState(false);
-  const userId = "anonymous"; // TODO: replace with auth.uid when integrating
+  const userId = getUserId();
 
-  // ✅ Radio buttons only update local state
   const handleRadioChange = (index, value) => {
     setAnswers(prev => ({ ...prev, [index]: value }));
   };
 
-  // ✅ Save button explicitly calls saveSurveyResponse
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -59,32 +57,15 @@ export function Page2() {
   return (
     <ThemeProvider theme={theme}>
       <Container maxWidth="md" sx={{ mt: 4 }}>
-        <Button
-          component={Link}
-          to="/"
-          variant="outlined"
-          startIcon={<HomeIcon />}
-          sx={{
-            mb: 2,
-            color: "black",
-            fontWeight: "bold",
-            borderColor: "black",
-            "&:hover": {
-              borderColor: "black",
-              backgroundColor: "#f5f5f5",
-            },
-          }}
-        >
+        <Button component={Link} to="/" variant="outlined" startIcon={<HomeIcon />} sx={{ mb: 2, color: "black", fontWeight: "bold", borderColor: "black", "&:hover": { borderColor: "black", backgroundColor: "#f5f5f5" } }}>
           Home
         </Button>
-
         <Typography variant="h1" gutterBottom>
           Fundamentals of Persuasion and Influence
         </Typography>
         <Typography variant="body1" gutterBottom>
           <strong>Instructions:</strong> Please indicate whether the following statements are <strong>Mostly True</strong> or <strong>Mostly False</strong> regarding how you generally approach conflict and negotiation.
         </Typography>
-
         <Paper sx={{ p: 3 }}>
           <Table>
             <TableHead>
@@ -99,35 +80,17 @@ export function Page2() {
                 <TableRow key={index}>
                   <TableCell>{q}</TableCell>
                   <TableCell align="center">
-                    <Radio
-                      checked={answers[index] === "true"}
-                      onChange={() => handleRadioChange(index, "true")}
-                      value="true"
-                      name={`c${index + 1}`}
-                    />
+                    <Radio checked={answers[index] === "true"} onChange={() => handleRadioChange(index, "true")} value="true" name={`c${index}`} />
                   </TableCell>
                   <TableCell align="center">
-                    <Radio
-                      checked={answers[index] === "false"}
-                      onChange={() => handleRadioChange(index, "false")}
-                      value="false"
-                      name={`c${index + 1}`}
-                    />
+                    <Radio checked={answers[index] === "false"} onChange={() => handleRadioChange(index, "false")} value="false" name={`c${index}`} />
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </Paper>
-
-        {/* ✅ Save Button */}
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSave}
-          disabled={isSaving}
-          sx={{ mt: 2, fontWeight: 'bold' }}
-        >
+        <Button variant="contained" color="primary" onClick={handleSave} disabled={isSaving} sx={{ mt: 2, fontWeight: 'bold' }}>
           {isSaving ? "Saving..." : "Save Responses"}
         </Button>
       </Container>

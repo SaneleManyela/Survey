@@ -29,7 +29,7 @@ export async function getAllSurveyResponses() {
 export async function saveAdminPassword(password, expiresAt) {
   try {
     const res = await fetch(`${API_URL}/adminPassword`, { // ✅ backticks
-      method: 'PUT', // ✅ PUT instead of POST
+      method: 'POST', // ✅ PUT instead of POST
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password, expiresAt })
     });

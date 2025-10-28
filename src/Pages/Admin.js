@@ -109,24 +109,26 @@ function aggregateCounts(responses, pageKey, numQuestions, options) {
   const counts = Array.from({ length: numQuestions }, () =>
     Object.fromEntries(options.map((opt) => [opt, 0]))
   );
+
   responses.forEach((resp) => {
-    const pageAnswers = resp.responses?.[pageKey] || {};
+    const pageAnswers = resp[pageKey] || {}; // ✅ use top-level key
     Object.entries(pageAnswers).forEach(([qIdx, value]) => {
       if (counts[qIdx] && counts[qIdx][value] !== undefined) counts[qIdx][value]++;
     });
   });
+
   return counts;
 }
 
 // Count participants per page
 function countParticipantsPerPage(responses, pageKey) {
-  return responses.filter((resp) => resp.responses?.[pageKey]).length;
+  return responses.filter((resp) => resp[pageKey]).length; // ✅ use top-level key
 }
 
 export function Admin() {
   const [loading, setLoading] = useState(true);
   const [responses, setResponses] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0); // current survey page
+  const [currentPage, setCurrentPage] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedResponses, setSelectedResponses] = useState([]);
 
@@ -144,10 +146,9 @@ export function Admin() {
     const pageKey = `page${pageIdx}`;
     const pageResponses = responses.map((resp) => ({
       id: resp.id,
-      answers: resp.responses?.[pageKey] || {},
+      answers: resp[pageKey] || {}, // ✅ fixed
     }));
     setSelectedResponses(pageResponses);
-    console.log("AllSurveyResponses:", responses);
     setOpenDialog(true);
   };
 
@@ -157,12 +158,7 @@ export function Admin() {
   };
 
   const page = pageQuestions[currentPage] || { title: "", questions: [], options: [] };
-  const counts = aggregateCounts(
-    responses,
-    `page${currentPage}`,
-    page.questions.length,
-    page.options
-  );
+  const counts = aggregateCounts(responses, `page${currentPage}`, page.questions.length, page.options);
   const participantsPerPage = countParticipantsPerPage(responses, `page${currentPage}`);
 
   return (
@@ -173,13 +169,7 @@ export function Admin() {
           to="/"
           variant="outlined"
           startIcon={<HomeIcon />}
-          sx={{
-            mb: 2,
-            color: "black",
-            fontWeight: "bold",
-            borderColor: "black",
-            "&:hover": { borderColor: "black", backgroundColor: "#f5f5f5" },
-          }}
+          sx={{ mb: 2, color: "black", fontWeight: "bold", borderColor: "black", "&:hover": { borderColor: "black", backgroundColor: "#f5f5f5" } }}
         >
           Home
         </Button>
@@ -236,21 +226,13 @@ export function Admin() {
 
           {/* Pagination buttons */}
           <div style={{ marginTop: 16, display: "flex", justifyContent: "space-between" }}>
-            <Button
-              disabled={currentPage === 0}
-              onClick={() => setCurrentPage((p) => p - 1)}
-              sx={{ color: "black", borderColor: "black" }}
-            >
+            <Button disabled={currentPage === 0} onClick={() => setCurrentPage((p) => p - 1)} sx={{ color: "black", borderColor: "black" }}>
               Previous
             </Button>
             <Typography>
               Page {currentPage + 1} / {pageQuestions.length}
             </Typography>
-            <Button
-              disabled={currentPage === pageQuestions.length - 1}
-              onClick={() => setCurrentPage((p) => p + 1)}
-              sx={{ color: "black", borderColor: "black" }}
-            >
+            <Button disabled={currentPage === pageQuestions.length - 1} onClick={() => setCurrentPage((p) => p + 1)} sx={{ color: "black", borderColor: "black" }}>
               Next
             </Button>
           </div>
@@ -260,11 +242,7 @@ export function Admin() {
         <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="md">
           <DialogTitle>
             Individual Responses
-            <IconButton
-              aria-label="close"
-              onClick={handleCloseDialog}
-              sx={{ position: "absolute", right: 8, top: 8 }}
-            >
+            <IconButton aria-label="close" onClick={handleCloseDialog} sx={{ position: "absolute", right: 8, top: 8 }}>
               <CloseIcon />
             </IconButton>
           </DialogTitle>

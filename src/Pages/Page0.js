@@ -13,11 +13,11 @@ import {
   Radio,
   Button,
 } from "@mui/material";
-import { Link } from 'react-router-dom';
-import HomeIcon from '@mui/icons-material/Home';
+import { Link } from "react-router-dom";
+import HomeIcon from "@mui/icons-material/Home";
 import { saveSurveyResponse } from "../db/dbStore.js";
+import { getUserId } from "../utils/userIdGenerator.js";
 
-// ===================== PAGE 1 =====================
 const questionsSurvey0 = [
   "Typically, when I speak in a group, others tend to pause and listen.",
   "My written work, such as emails and social media posts, consistently receives excellent responses.",
@@ -35,14 +35,12 @@ const questionsSurvey0 = [
 export function Page0() {
   const [answers, setAnswers] = useState({});
   const [isSaving, setIsSaving] = useState(false);
-  const userId = "anonymous"; 
-  
-  // ✅ Radio buttons only update local state
+  const userId = getUserId();
+
   const handleRadioChange = (index, value) => {
-    setAnswers(prev => ({ ...prev, [index]: value }));
+    setAnswers((prev) => ({ ...prev, [index]: value }));
   };
 
-  // ✅ Save button explicitly calls saveSurveyResponse
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -66,21 +64,13 @@ export function Page0() {
           to="/"
           variant="outlined"
           startIcon={<HomeIcon />}
-          sx={{
-            mb: 2,
-            color: 'black',
-            fontWeight: 'bold',
-            borderColor: 'black',
-            '&:hover': { borderColor: 'black', backgroundColor: '#f5f5f5' }
-          }}
+          sx={{ mb: 2, color: "black", fontWeight: "bold", borderColor: "black", "&:hover": { borderColor: "black", backgroundColor: "#f5f5f5" } }}
         >
           Home
         </Button>
-
         <Typography variant="h1" gutterBottom>
           Foundations of Communication Style
         </Typography>
-
         <Paper sx={{ p: 3 }}>
           <Table>
             <TableHead>
@@ -95,35 +85,17 @@ export function Page0() {
                 <TableRow key={index}>
                   <TableCell>{q}</TableCell>
                   <TableCell align="center">
-                    <Radio
-                      checked={answers[index] === "true"}
-                      onChange={() => handleRadioChange(index, "true")}
-                      name={`q${index}`}
-                      value="true"
-                    />
+                    <Radio checked={answers[index] === "true"} onChange={() => handleRadioChange(index, "true")} name={`q${index}`} value="true" />
                   </TableCell>
                   <TableCell align="center">
-                    <Radio
-                      checked={answers[index] === "false"}
-                      onChange={() => handleRadioChange(index, "false")}
-                      name={`q${index}`}
-                      value="false"
-                    />
+                    <Radio checked={answers[index] === "false"} onChange={() => handleRadioChange(index, "false")} name={`q${index}`} value="false" />
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </Paper>
-
-        {/* ✅ Save Button */}
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSave}
-          disabled={isSaving}
-          sx={{ mt: 2, fontWeight: 'bold' }}
-        >
+        <Button variant="contained" color="primary" onClick={handleSave} disabled={isSaving} sx={{ mt: 2, fontWeight: "bold" }}>
           {isSaving ? "Saving..." : "Save Responses"}
         </Button>
       </Container>

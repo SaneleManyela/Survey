@@ -9,7 +9,7 @@ import { Page2 } from './Pages/Page2.js';
 import { Page3 } from './Pages/Page3.js';
 import { Page4 } from './Pages/Page4.js';
 import { Admin } from './Pages/Admin.js';
-import { startPasswordScheduler } from './utils/passwordscheduler.js';
+import { getUserId } from './utils/userIdGenerator.js';
 
 // ---------------- MainMenu ----------------
 function MainMenu() {
@@ -56,7 +56,7 @@ function MainMenu() {
 // ---------------- App ----------------
 export default function App() {
   useEffect(() => {
-    startPasswordScheduler();
+    getUserId();
   }, []);
 
   return (
