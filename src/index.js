@@ -1,13 +1,16 @@
 // src/index.js
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { HashRouter as Router } from 'react-router-dom';
-import App from './App';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { HashRouter } from "react-router-dom";
+import App from "./App";
 
-// ✅ HashRouter ensures that refresh and direct links work on GitHub Pages
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
+
+// ✅ Remove basename for HashRouter
 root.render(
-  <Router basename="/Survey">
-    <App />
-  </Router>
+  <React.StrictMode>
+    <HashRouter>
+      <App />
+    </HashRouter>
+  </React.StrictMode>
 );
