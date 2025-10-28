@@ -8,7 +8,7 @@ import { Page1 } from './Pages/Page1.js';
 import { Page2 } from './Pages/Page2.js';
 import { Page3 } from './Pages/Page3.js';
 import { Page4 } from './Pages/Page4.js';
-import { Admin } from './Pages/Admin.js';
+//import { Admin } from './Pages/Admin.js';
 import { getUserId } from './utils/userIdGenerator.js';
 
 // ---------------- MainMenu ----------------
@@ -21,7 +21,7 @@ function MainMenu() {
     { title: "Fundamentals of Persuasion and Influence", path: "/Page2" },
     { title: "Style of Conflict Resolution Self-Evaluation", path: "/Page3" },
     { title: "Assessing One's Leadership: Potential towards Conflict", path: "/Page4" },
-    { title: "Admin Panel", path: "/Admin" }
+    //{ title: "Admin Panel", path: "/Admin" }
   ];
 
   const handleCardClick = (item) => {
@@ -67,7 +67,7 @@ export default function App() {
         <Route path="/Page2" element={<Page2 />} />
         <Route path="/Page3" element={<Page3 />} />
         <Route path="/Page4" element={<Page4 />} />
-        <Route path="/Admin" element={<Admin />} />
+        {/* <Route path="/Admin" element={<Admin />} /> */}
       </Routes>
   );
 }
