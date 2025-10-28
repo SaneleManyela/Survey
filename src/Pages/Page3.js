@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
-import { saveSurveyResponse } from "../db/dbStore.js";
+import { saveMultiChoiceSurveyResponses } from "../db/dbStore.js";
 import { getUserId } from "../utils/userIdGenerator.js";
 
 // ===================== PAGE 4 =====================
@@ -47,7 +47,8 @@ export function Page3() {
     setIsSaving(true);
     try {
       console.log("Saving survey response...", { userId, page: "page3", answers });
-      const result = await saveSurveyResponse(userId, { page: "page3", answers });
+      //const result = await saveSurveyResponse(userId, { page: "page3", answers });
+      const result = await saveMultiChoiceSurveyResponses(userId, "page3", answers);
       console.log("Save result:", result);
       if (!result.success) alert("Failed to save your responses: " + result.error);
     } catch (err) {
@@ -101,12 +102,16 @@ export function Page3() {
               {leadershipQuestions.map((q, index) => (
                 <TableRow key={index}>
                   <TableCell>{q}</TableCell>
-                  <TableCell align="center">
-                    <Radio checked={answers[index] === "true"} onChange={() => handleRadioChange(index, "true")} value="true" name={`c${index}`} />
-                  </TableCell>
-                  <TableCell align="center">
-                    <Radio checked={answers[index] === "false"} onChange={() => handleRadioChange(index, "false")} value="false" name={`c${index}`} />
-                  </TableCell>
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <TableCell key={num} align="center">
+                      <Radio
+                        checked={answers[index] === num.toString()}
+                        onChange={() => handleRadioChange(index, num.toString())}
+                        value={num.toString()}
+                        name={`cp${index + 1}`}
+                      />
+                    </TableCell>
+                  ))}
                 </TableRow>
               ))}
             </TableBody>

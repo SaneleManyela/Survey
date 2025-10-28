@@ -1,11 +1,15 @@
-const API_URL = 'https://survey-u3s9.onrender.com/api'; // Update with your deployed URL
+// src/db/dbStore.js
+const API_URL = 'https://survey-u3s9.onrender.com/api'; // ✅ your deployed backend
 
+/**
+ * Save a generic single-choice or text-based survey response
+ */
 export async function saveSurveyResponse(userId, { page, answers }) {
   try {
     const res = await fetch(`${API_URL}/saveSurvey`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, page, answers })
+      body: JSON.stringify({ userId, page, answers }),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
@@ -15,6 +19,9 @@ export async function saveSurveyResponse(userId, { page, answers }) {
   }
 }
 
+/**
+ * Get all standard survey responses
+ */
 export async function getAllSurveyResponses() {
   try {
     const res = await fetch(`${API_URL}/allSurveys`);
@@ -26,18 +33,49 @@ export async function getAllSurveyResponses() {
   }
 }
 
+/**
+ * ✅ Save multi-choice (Likert scale) survey responses
+ */
+export async function saveMultiChoiceSurveyResponses(userId, page, answers) {
+  try {
+    const res = await fetch(`${API_URL}/saveMultiChoiceSurvey`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, page, answers }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (error) {
+    console.error('Error saving multi-choice survey responses:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * ✅ Get all multi-choice survey responses
+ */
+export async function getAllMultiChoiceSurveyResponses() {
+  try {
+    const res = await fetch(`${API_URL}/allMultiChoiceSurveys`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (error) {
+    console.error('Error fetching multi-choice survey responses:', error);
+    return [];
+  }
+}
+
+/**
+ * Admin password storage + retrieval
+ */
 export async function saveAdminPassword(password, expiresAt) {
   try {
-    const res = await fetch(`${API_URL}/adminPassword`, { // ✅ backticks
-      method: 'POST', // ✅ PUT instead of POST
+    const res = await fetch(`${API_URL}/adminPassword`, {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password, expiresAt })
+      body: JSON.stringify({ password, expiresAt }),
     });
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
-    }
-
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (error) {
     console.error('Error saving admin password:', error);

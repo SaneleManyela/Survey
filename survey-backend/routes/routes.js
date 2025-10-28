@@ -48,6 +48,54 @@ router.get("/allSurveys", async (req, res) => {
 });
 
 /**
+ * ✅ Save multi-choice survey responses (e.g., Likert scale)
+ * POST /api/saveMultiChoiceSurvey
+ * body: { userId, page, answers }
+ */
+router.post("/saveMultiChoiceSurvey", async (req, res) => {
+  const { userId, page, answers } = req.body;
+  if (!userId || !page || !answers)
+    return res.status(400).json({ success: false, error: "Missing required fields" });
+
+  try {
+    const userDocRef = db.collection("multiChoiceSurveys").doc(userId);
+
+    await userDocRef.set(
+      {
+        [page]: {
+          answers,
+          updatedAt: new Date().toISOString(),
+        },
+      },
+      { merge: true }
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Error saving multi-choice survey:", err);
+    res.status(500).json({ success: false, error: String(err) });
+  }
+});
+
+/**
+ * ✅ Retrieve all multi-choice survey responses
+ * GET /api/allMultiChoiceSurveys
+ */
+router.get("/allMultiChoiceSurveys", async (req, res) => {
+  try {
+    const snapshot = await db.collection("multiChoiceSurveys").get();
+    const allResponses = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    res.json(allResponses);
+  } catch (err) {
+    console.error("Error fetching multi-choice surveys:", err);
+    res.status(500).json({ success: false, error: String(err) });
+  }
+});
+
+/**
  * Save admin password
  * POST /api/adminPassword
  * body: { password, expiresAt }
