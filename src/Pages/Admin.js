@@ -147,6 +147,7 @@ export function Admin() {
       answers: resp.responses?.[pageKey] || {},
     }));
     setSelectedResponses(pageResponses);
+    console.log("AllSurveyResponses:", responses);
     setOpenDialog(true);
   };
 

@@ -15,8 +15,6 @@ export async function schedulePassword() {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 1); // expires in 1 day
 
-  // ❌ REMOVED: await getAdminPassword().then(...)
-  // ✅ ADDED: A direct call to the saving function
   const result = await saveAdminPassword(password, expiresAt);
 
   if (result.success) {
